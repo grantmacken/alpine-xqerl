@@ -10,7 +10,6 @@ RUN apk add --no-cache --virtual .build-deps git \
   && rebar3 release -o _build
 
 FROM alpine:3.10
-
 # Install some libs
 RUN apk add --no-cache openssl ncurses-libs 
 COPY --from=0 /home/xqerl/_build/xqerl /usr/local/xqerl
@@ -23,6 +22,5 @@ ENV LANG C.UTF-8
 # Use SIGQUIT instead of default SIGTERM to cleanly drain requests
 # See https://github.com/openresty/docker-openresty/blob/master/README.md#tips--pitfalls
 STOPSIGNAL SIGQUIT
-# ENTRYPOINT ["bin/ash"]
 
 

@@ -10,6 +10,6 @@ install: make build
 script:
   - docker network create www
   - docker-compose up -d
-  - docker ps
+  - sleep 10
   - make check
   - docker-compose down
