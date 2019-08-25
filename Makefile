@@ -31,14 +31,12 @@ buildTargetShell:
   --tag="$(DOCKER_IMAGE):shell" \
  .
 
-
 .PHONY: build
 build:
 	@docker build \
   --tag="$(DOCKER_IMAGE):$(DOCKER_TAG)" \
   --tag="$(DOCKER_IMAGE):v$(shell date --iso | sed s/-//g)" \
  .
-
 
 .PHONY: push
 push:
