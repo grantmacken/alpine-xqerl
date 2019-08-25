@@ -11,6 +11,5 @@ script:
   - docker network create www
   - docker-compose up -d
   - docker ps
-  - docker exec xq ls ./bin | grep 'xqerl'
-  - docker exec xq ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
+  - make check
   - docker-compose down
