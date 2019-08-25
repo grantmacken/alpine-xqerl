@@ -1,0 +1,22 @@
+version: '3.4'
+services:
+  xqerl:
+    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
+    container_name: ${XQERL_CONTAINER_NAME}
+    ports:
+        - ${XQERL_PORT}:${XQERL_PORT}
+    volumes:
+      - type: volume
+        source: db
+        target: ${XQERL_HOME}/${DATA_DIR}
+
+volumes:
+  db:
+    driver: local
+    name: ${XQERL_CONTAINER_NAME}Data
+
+networks:
+  default:
+    external:
+      name: $NETWORK
+
