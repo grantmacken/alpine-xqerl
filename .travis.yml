@@ -8,6 +8,7 @@ services:
   - docker
 install: make build
 script:
+  - docker network create www
   - docker-compose up -d
   - docker ps
   - docker exec xq ls ./bin | grep 'xqerl'
