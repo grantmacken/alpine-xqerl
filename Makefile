@@ -5,8 +5,8 @@ default:
 
 .PHONY: check
 check:
-	@docker ps
-	@docker exec $(XQERL_CONTAINER_NAME) ls -al ./bin
+	@#docker ps
+	@#docker exec $(XQERL_CONTAINER_NAME) ls -al ./bin
 	@docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
 	@docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \")."
 
@@ -17,7 +17,6 @@ up:
 .PHONY: down
 down:
 	@docker-compose down
-
 
 .PHONY: build
 build:
@@ -42,3 +41,7 @@ travis:
 	@travis env set DOCKER_USERNAME $(shell git config --get user.name)
 	@#travis env set DOCKER_PASSWORD
 	@travis env list
+
+.PHONY: network 
+network: 
+	@docker network create $(NETWORK)
