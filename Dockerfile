@@ -15,8 +15,7 @@ RUN apk add --no-cache openssl ncurses-libs
 COPY --from=0 /home/xqerl/_build/xqerl /usr/local/xqerl
 ENV XQERL_HOME /usr/local/xqerl
 WORKDIR $XQERL_HOME  
-ENTRYPOINT ["./bin/xqerl"]
-CMD ["foreground"]
+CMD ["./bin/xqerl", "foreground"]
 EXPOSE 8081
 ENV LANG C.UTF-8
 # Use SIGQUIT instead of default SIGTERM to cleanly drain requests
