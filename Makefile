@@ -1,14 +1,20 @@
 include .env
 
 default: 
-	@echo 'WIP'
+	@docker run -it grantmacken/alpine-xqerl:shell
+
+.PHONY: shell
+shell:
+	@docker run -it grantmacken/alpine-xqerl:shell
+
 
 .PHONY: check
 check:
-	@#docker ps
+	@docker ps
+	@docker stats
 	@#docker exec $(XQERL_CONTAINER_NAME) ls -al ./bin
-	@docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
-	@docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \")."
+	@#docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
+	@#docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \")."
 
 .PHONY: up
 up:
@@ -17,6 +23,14 @@ up:
 .PHONY: down
 down:
 	@docker-compose down
+
+.PHONY: buildTargetShell
+buildTargetShell:
+	@docker build \
+  --target="shell" \
+  --tag="$(DOCKER_IMAGE):shell" \
+ .
+
 
 .PHONY: build
 build:

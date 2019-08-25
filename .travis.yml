@@ -8,8 +8,6 @@ services:
   - docker
 install: make build
 script:
-  - docker network create www
   - docker-compose up -d
-  - sleep 10
   - make check
   - docker-compose down
