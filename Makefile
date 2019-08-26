@@ -38,14 +38,14 @@ build:
 	@docker build \
   --target="$(if $(TARGET),$(TARGET),$(DOCKER_TAG))" \
   --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(DOCKER_TAG))" \
-  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(DOCKER_TAG))v$(shell date --iso | sed s/-//g)" \
+  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(DOCKER_TAG))-$(shell date --iso | sed s/-//g)" \
  .
 
 .PHONY: push
 push:
 	@echo '## $@ ##'
 	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(DOCKER_TAG))
-	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(DOCKER_TAG))v$(shell date --iso | sed s/-//g)
+	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(DOCKER_TAG))-$(shell date --iso | sed s/-//g)
 
 .PHONY: clean
 clean:
