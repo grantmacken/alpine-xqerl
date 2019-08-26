@@ -1,16 +1,17 @@
-# alpine-xqerl
- 
-Maintained by [Zachary Dean](https://github.com/zadean) 
-[xqerl](https://zadean.github.io/xqerl) is an Erlang XQuery 3.1 Processor and XML Database.
+# WIP [alpine-xqerl](https://github.com/grantmacken/alpine-xqerl)
 
+Test build on [travis-ci](https://travis-ci.org/grantmacken/alpine-xqerl)
 
-This WIP is my attempt to dockerize xqerl.
+[![Build Status](https://travis-ci.org/grantmacken/alpine-eXist.svg?branch=master)](https://travis-ci.org/grantmacken/alpine-xqerl)
 
-Why: TODO
+ [xqerl](https://zadean.github.io/xqerl)
+ maintained by 
+ [Zachary Dean](https://github.com/zadean) 
+ is an Erlang XQuery 3.1 Processor and XML Database.
 
-## fat playground and slim deploy targets
+## fat playground and minimized deploy targets
 
-Note: To save typing, I use Make to create shortcut aliases
+Note: To save typing, I use Make to create shortcut aliases.  e.g.
 
 ```
 make run-shell
@@ -18,7 +19,7 @@ make run-shell
 # docker run -it grantmacken/alpine-xqerl:shell
 ```
 
-1. *shell*: this is the fat playground 'desktop' target.
+1. *shell*: this is the fat (304MB) playground 'desktop' target.
 
 ```
 make run-shell
@@ -32,7 +33,11 @@ make run-shell
 TODO. cast
 
 
-2. *min*: this is a minimal, as small as I can get it, 'deploy' target
+2. *min*: this is a minimal ( 52MB ) image , as small as I can get it, 'deploy' image.
+
+
+[![asciicast](https://asciinema.org/a/264230.svg)](https://asciinema.org/a/264230)
+
 
 ```
 # make network
@@ -41,6 +46,8 @@ TODO. cast
 # which xq container will will join with ...
 make up
 # uses docker-compose to start container and join network
+make check
+# 
 ```
 
 

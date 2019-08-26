@@ -60,3 +60,34 @@ travis:
 .PHONY: network 
 network: 
 	@docker network create $(NETWORK)
+
+.PHONY: rec
+rec:
+	@mkdir -p ../tmp
+	@asciinema rec ../tmp/csv.cast \
+ --overwrite \
+ --title='grantmacken/alpine-xqerl ran `make up'\
+ --idle-time-limit 1 \
+ --command="\
+sleep 1 && printf %60s | tr ' ' '='  && echo && \
+echo ' - start the container ... ' && \
+make --silent up   && echo && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+echo ' - check running container status ... ' && \
+make --silent check   && echo && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+echo ' - example xqerl command using \"docker exec\" ... ' && \
+echo 'xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \"). ... '  && \
+make --silent do   && echo && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+make --silent down && \
+sleep 1 && printf %60s | tr ' ' '='  && echo\
+"
+
+PHONY: play
+play:
+	@clear && asciinema play ../tmp/csv.cast
+
+.PHONY: upload
+upload:
+	asciinema upload ../tmp/csv.cast
