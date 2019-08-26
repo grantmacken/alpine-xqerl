@@ -1,15 +1,17 @@
 # WIP [alpine-xqerl](https://github.com/grantmacken/alpine-xqerl)
 
+Pre-build images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl)
+
 Test build on [travis-ci](https://travis-ci.org/grantmacken/alpine-xqerl)
 
 [![Build Status](https://travis-ci.org/grantmacken/alpine-eXist.svg?branch=master)](https://travis-ci.org/grantmacken/alpine-xqerl)
 
  [xqerl](https://zadean.github.io/xqerl)
  maintained by 
- [Zachary Dean](https://github.com/zadean) 
+ [Zachary Dean](https://github.com/zadean),
  is an Erlang XQuery 3.1 Processor and XML Database.
 
-## fat playground and minimized deploy targets
+## fat playground and minimized deploy images
 
 Note: To save typing, I use Make to create shortcut aliases.  e.g.
 
