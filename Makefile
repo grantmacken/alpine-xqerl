@@ -7,15 +7,22 @@ default:
 shell:
 	@docker run -it grantmacken/alpine-xqerl:shell
 
+.PHONY: slim
+slim:
+	@docker run grantmacken/alpine-xqerl:slim --name xql
 
 .PHONY: check
 check:
-	@docker ps
+	@docker ps -a
 	@docker stats
 	@#docker exec $(XQERL_CONTAINER_NAME) ls -al ./bin
 	@#docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
 	@#docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \")."
 
+.PHONY: do
+do:
+	@docker exec xq ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
+	@docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \")."
 .PHONY: up
 up:
 	@docker-compose up -d
@@ -34,7 +41,8 @@ buildTargetShell:
 .PHONY: build
 build:
 	@docker build \
-  --tag="$(DOCKER_IMAGE):$(DOCKER_TAG)" \
+  --target="$(if $(TARGET),$(TARGET),slim)" \
+  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),slim)" \
   --tag="$(DOCKER_IMAGE):v$(shell date --iso | sed s/-//g)" \
  .
 
@@ -46,7 +54,7 @@ push:
 
 .PHONY: clean
 clean:
-	@docker images -a | grep "grantmacken" | awk '{print $3}' | xargs docker rmi
+	@docker images -a | grep "xqerl" | awk '{print $3}' | xargs docker rmi
 
 .PHONY: travis
 travis: 
