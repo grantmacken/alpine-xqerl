@@ -11,17 +11,8 @@ Test build on [travis-ci](https://travis-ci.org/grantmacken/alpine-xqerl)
  [Zachary Dean](https://github.com/zadean),
  is an Erlang XQuery 3.1 Processor and XML Database.
 
-## fat playground and minimized deploy images
 
-Note: To save typing, I use Make to create shortcut aliases.  e.g.
-
-```
-make run-shell
-# shortcut for
-# docker run -it grantmacken/alpine-xqerl:shell
-```
-
-## Fat playground image
+## Fat Playground Desktop Image
 
 This image is tagged 'shell'
 
@@ -32,17 +23,17 @@ docker run -it grantmacken/alpine-xqerl:shell
 
 This starts xqerl from ENTRYPOINT `rebar3 shell` to pop you into
 the *interactive* erlang shell. 
-The container contains a clone the  [xqerl repo](https://zadean.github.io/xqerl)so from here you should be able to follow the 
+The container contains a clone the  [xqerl repo](https://zadean.github.io/xqerl) so from here you should be able to follow the 
 [Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md)
 tutorial from section 4 onwards.
 
-## Minimal deploy image
+## Minimal Deploy Image
 
 ```
-docker pull grantmacken/alpine-xqerl:min
+docker pull grantmacken/alpine-xqerl:latest
 ```
 
-This is a small 'deploy' image, where an binary executable boots the xqerl environment,
+This is a small 'deploy' image, where a binary executable boots the xqerl environment,
 
 ```
 ENTRYPOINT ["./bin/xqerl","foreground" ]
