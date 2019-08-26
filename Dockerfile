@@ -11,12 +11,11 @@ RUN apk add --no-cache --virtual .build-deps git \
 
 WORKDIR  /home/xqerl
 ENTRYPOINT ["rebar3", "shell"]
-# CMD ["application:ensure_all_started(xqerl)"]
 
-FROM alpine:3.9 as slim
+FROM alpine:3.9 as min
 COPY --from=shell /home/xqerl/_build/xqerl /usr/local/xqerl
-COPY --from=shell /usr/lib/libncursesw* /usr/lib/
 # Install some libs
+COPY --from=shell /usr/lib/libncursesw* /usr/lib/
 ENV XQERL_HOME /usr/local/xqerl
 WORKDIR /usr/local/xqerl
 ENTRYPOINT ["./bin/xqerl","foreground" ]
@@ -25,7 +24,6 @@ EXPOSE 8081
 ENV LANG C.UTF-8
 # Use SIGQUIT instead of default SIGTERM to cleanly drain requests
 # See https://github.com/openresty/docker-openresty/blob/master/README.md#tips--pitfalls
-#STOPSIGNAL SIGQUIT
 STOPSIGNAL SIGQUIT
 
 

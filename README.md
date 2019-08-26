@@ -10,9 +10,18 @@ Why: TODO
 
 ## fat playground and slim deploy targets
 
-1. *shell*: this is the fat playground 'desktop' target.
+Note: To save typing, I use Make to create shortcut aliases
+
 ```
-docker run -it grantmacken/alpine-xqerl:shell
+make run-shell
+# shortcut for
+# docker run -it grantmacken/alpine-xqerl:shell
+```
+
+1. *shell*: this is the fat playground 'desktop' target.
+
+```
+make run-shell
 ```
   This starts xqerl from ENTRYPOINT `rebar3 shell` to pop you into
   the *interactive* erlang shell. 
@@ -23,8 +32,17 @@ docker run -it grantmacken/alpine-xqerl:shell
 TODO. cast
 
 
+2. *min*: this is a minimal, as small as I can get it, 'deploy' target
 
-2. *latest*: this is a slim, as small as I can get it, 'deploy' target
+```
+# make network
+# do only once
+# make network creates a named bridge network, 
+# which xq container will will join with ...
+make up
+# uses docker-compose to start container and join network
+```
+
 
 
  
