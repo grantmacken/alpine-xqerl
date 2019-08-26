@@ -82,10 +82,10 @@ docker exec xq ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs')
 ```
 
 The following cast 
-1. brings the container up `docker compose up -d`
+1. brings the container up `docker-compose up -d`
 2. runs various docker commands like `docker ps --filter name=xq --format ' -  status: {{.Status}}'`
 3. runs `docker exec xq` commands
-4. brings down the container  `docker compose down`
+4. brings down the container  `docker-compose down`
 
 [![asciicast](https://asciinema.org/a/264230.svg)](https://asciinema.org/a/264230)
 
