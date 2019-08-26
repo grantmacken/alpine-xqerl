@@ -1,13 +1,12 @@
 # Travis yaml grantmacken/alpine-openresty
 # https://github.com/grantmacken/alpine-openresty
 sudo: required
-dist: xenial
+dist: bionic
 os: linux
 language: minimal
-services:
-  - docker
+services: docker
+before_install: make network
 install: make build
-script:
-  - docker-compose up -d
-  - make check
-  - docker-compose down
+before_script: docker-compose up -d
+script: make check
+after_script: docker-compose down
