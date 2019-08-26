@@ -15,8 +15,8 @@ slim:
 check:
 	@docker ps -a
 	@docker-compose logs
-	@#docker exec $(XQERL_CONTAINER_NAME) ls -al ./bin
-	@#docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
+	@docker exec $(XQERL_CONTAINER_NAME) ls -al ./bin
+	@docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
 	@#docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \")."
 
 .PHONY: do
