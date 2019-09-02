@@ -1,29 +1,88 @@
 include .env
+XQN=$(XQERL_CONTAINER_NAME)
+EVAL=docker exec $(XQN) ./bin/xqerl eval
 
 default: up
 
 .PHONY: run-shell
 run-shell:
-	@docker run -it grantmacken/alpine-xqerl:shell
+	@docker run \
+  -it --rm \
+  --name xq1 \
+  --network www \
+  --publish 8081:8081 \
+  --log-driver=journald \
+  grantmacken/alpine-xqerl:shell
+
+
+.PHONY: inspect
+inspect:
+	docker inspect -f '{{.HostConfig.LogConfig.Type}}' xq1
+	@#curl -v http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' xq1):8081
+	@#curl -v http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' xq1):8081
+	@docker exec xq1 ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
+	@docker exec xq1 ./bin/xqerl eval 'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
+	@#docker exec xq1 ./bin/xqerl eval 'xqerl:compile("/home/xqerl/docs/src/sudoku2.xq").'
+	@docker exec xq1 ./bin/xqerl eval 'S = xqerl:compile("/home/xqerl/docs/src/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
+	@docker exec xq1 ./bin/xqerl eval 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","/home/xqerl/test/QT3-test-suite/app/FunctxFn/functx_order.xml").'
+	@docker exec xq1 ./bin/xqerl eval "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
+	@docker exec xq1 ./bin/xqerl eval 'xqldb_dml:delete_doc("http://xqerl.org/my_doc.xml").'
+	@docker exec xq1 ./bin/xqerl eval "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
+	@docker exec xq1 ./bin/xqerl eval 'xqldb_dml:import_from_directory("http://xqerl.org/tests/", "/home/xqerl/test/QT3-test-suite").'
 
 .PHONY: check
 check:
 	@# docker ps -a
 	@#docker-compose logs
+	@echo -n '- IP address: '
+	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQERL_CONTAINER_NAME) 
+	@printf %60s | tr ' ' '-' && echo
+	@curl -v \
+ http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQERL_CONTAINER_NAME) ):8081
+	@printf %60s | tr ' ' '-' && echo
 	@docker ps --filter name=$(XQERL_CONTAINER_NAME) --format ' -    name: {{.Names}}'
 	@docker ps --filter name=$(XQERL_CONTAINER_NAME) --format ' -  status: {{.Status}}'
 	@echo -n '-    port: '
 	@docker ps --format '{{.Ports}}' | grep -oP '^(.+):\K(\d{4})'
 	@#docker volume list 
-	@docker volume list  --format ' -  volume: {{.Name}}'
+	@docker volume list   --format ' -  volume: {{.Name}}'
 	@docker network list --filter name=$(NETWORK) --format ' - network: {{.Name}}'
 	@echo -n '- started: '
-	@docker exec xq ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
-	@docker exec $(XQERL_CONTAINER_NAME) cat ./log/erl.log
-
-.PHONY: do
-do:
-	@docker exec $(XQERL_CONTAINER_NAME) ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \")."
+	@$(EVAL) 'application:ensure_all_started(xqerl).'
+	@printf %60s | tr ' ' '=' && echo 
+	@echo ' - run a query '
+	$(EVAL) 'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo ' - copy xQuery file into container '
+	docker cp fixtures/sudoku2.xq $(XQN):/tmp
+	@echo ' - list files in tmp'
+	@docker exec $(XQN) ls /tmp
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo ' - compile an xQuery file'
+	@echo '   should return name of compiled file'
+	$(EVAL) 'xqerl:compile("/tmp/sudoku2.xq")'
+	@printf %60s | tr ' ' '-' && echo 
+	@echo ' - compile an xQuery file then run query'
+	@echo '   should return query result as XML'
+	$(EVAL) 'S = xqerl:compile("/tmp/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo ' - copy XML file into container '
+	@docker -v cp fixtures/functx_order.xml $(XQN):/tmp
+	@docker exec $(XQN) ls /tmp
+	@echo ' - insert XML into database'
+	@$(EVAL) 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","/tmp/functx_order.xml").'
+	@#docker exec $(XQERL_CONTAINER_NAME) cat ./log/erl.log
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo ' - run xQuery expression doc() to fetch form db '
+	$(EVAL) "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo ' -  delete database'
+	$(EVAL) 'xqldb_dml:delete_doc("http://xqerl.org/my_doc.xml").'
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo ' -  try to fetch from database, the deleted file'
+	@echo '    should throw an error'
+	$(EVAL) "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
+	@printf %60s | tr ' ' '=' && echo ''
 
 .PHONY: up
 up:
@@ -49,7 +108,9 @@ push:
 
 .PHONY: clean
 clean:
-	@docker images -a | grep "xqerl" | awk '{print $3}' | xargs docker rmi
+	@docker image prune -a
+	@docker container prune
+	@docker images -a | grep "xqerl" | awk '{print $3}'
 
 .PHONY: travis
 travis: 

@@ -17,8 +17,7 @@ Test build on [travis-ci](https://travis-ci.org/grantmacken/alpine-xqerl)
 This image is tagged 'shell'
 
 ```
-docker pull grantmacken/alpine-xqerl:shell
-docker run -it grantmacken/alpine-xqerl:shell
+docker run -it --rm grantmacken/alpine-xqerl:shell
 ```
 
 This starts xqerl from ENTRYPOINT `rebar3 shell` to pop you into
@@ -26,6 +25,28 @@ the *interactive* erlang shell.
 The container contains a clone the  [xqerl repo](https://zadean.github.io/xqerl) so from here you should be able to follow the 
 [Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md)
 tutorial from section 4 onwards.
+
+If you have a OS with 'systemd' init system (i.e. most modern linux OS),
+you may also want to view the xqerl logged output from the container. 
+
+
+
+```
+docker run \
+  -it --rm \
+  --name xqShell \
+  --network www \
+  --publish 8081:8081 \
+  --log-driver=journald \
+  grantmacken/alpine-xqerl:shell
+```
+
+Now the erlang shell, as you work through the xqerl tutorial,
+In another terminal you can follow the container logged output.
+
+```
+sudo journalctl -b CONTAINER_NAME=xqShell --all -f
+```
 
 ## Minimal Deploy Image
 
