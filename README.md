@@ -1,4 +1,4 @@
-# WIP [alpine-xqerl](https://github.com/grantmacken/alpine-xqerl)
+# [alpine-xqerl](https://github.com/grantmacken/alpine-xqerl)
 
 Pre-build images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl)
 
@@ -41,8 +41,8 @@ docker run \
   grantmacken/alpine-xqerl:shell
 ```
 
-Now the erlang shell, as you work through the xqerl tutorial,
-In another terminal you can follow the container logged output.
+Now in the erlang shell, as you work through the [Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md) tutorial,
+in another terminal you can follow the container logged output, by using the following command.
 
 ```
 sudo journalctl -b CONTAINER_NAME=xqShell --all -f
@@ -54,7 +54,7 @@ sudo journalctl -b CONTAINER_NAME=xqShell --all -f
 docker pull grantmacken/alpine-xqerl:latest
 ```
 
-This is a small 'deploy' image, where a binary executable boots the xqerl environment,
+This is a smallish 'deploy' image, where a binary executable boots the xqerl environment,
 
 ```
 ENTRYPOINT ["./bin/xqerl","foreground" ]
@@ -65,11 +65,12 @@ I have provided and example 'docker-compose.yml' and '.env'
 which you can copy/clone and use boot your xqerl project.
 
 The docker-compose run time environment includes
-1. A container name 'xq'.
-2. A persistent docker volume named 'xqData'.
+1. A container name 'xq'
+2. Two persistent docker volumes 
+  1. A volume named 'data' which holds the database data
+  2. A volume name 'code' which holds the compiled xQuery files 
 4. A network named 'www' 
 5. A port published on 8081
-
 
 In my docker-compose the running container attaches to a pre-existing 
 named network, so you will need to create that first. 
@@ -100,6 +101,9 @@ The following cast
 4. brings down the container  `docker-compose down`
 
 [![asciicast](https://asciinema.org/a/264230.svg)](https://asciinema.org/a/264230)
+
+
+
 
 
 
