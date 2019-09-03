@@ -65,12 +65,12 @@ I have provided and example 'docker-compose.yml' and '.env'
 which you can copy/clone and use boot your xqerl project.
 
 The docker-compose run time environment includes
-1. A container name 'xq'
-2. Two persistent docker volumes 
-  1. A volume named 'data' which holds the database data
-  2. A volume name 'code' which holds the compiled xQuery files 
-4. A network named 'www' 
-5. A port published on 8081
+* A container name 'xq'
+* Two persistent docker volumes 
+    1. A volume named 'data' which holds the database data
+    2. A volume name 'code' which holds the compiled xQuery files 
+* A network named 'www' 
+* A port published on 8081
 
 In my docker-compose the running container attaches to a pre-existing 
 named network, so you will need to create that first. 
