@@ -14,34 +14,22 @@ run-shell:
   --log-driver=journald \
   grantmacken/alpine-xqerl:shell
 
-
 .PHONY: inspect
 inspect:
-	docker inspect -f '{{.HostConfig.LogConfig.Type}}' xq1
-	@#curl -v http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' xq1):8081
-	@#curl -v http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' xq1):8081
-	@docker exec xq1 ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
-	@docker exec xq1 ./bin/xqerl eval 'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
-	@#docker exec xq1 ./bin/xqerl eval 'xqerl:compile("/home/xqerl/docs/src/sudoku2.xq").'
-	@docker exec xq1 ./bin/xqerl eval 'S = xqerl:compile("/home/xqerl/docs/src/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
-	@docker exec xq1 ./bin/xqerl eval 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","/home/xqerl/test/QT3-test-suite/app/FunctxFn/functx_order.xml").'
-	@docker exec xq1 ./bin/xqerl eval "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
-	@docker exec xq1 ./bin/xqerl eval 'xqldb_dml:delete_doc("http://xqerl.org/my_doc.xml").'
-	@docker exec xq1 ./bin/xqerl eval "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
-	@docker exec xq1 ./bin/xqerl eval 'xqldb_dml:import_from_directory("http://xqerl.org/tests/", "/home/xqerl/test/QT3-test-suite").'
+	docker inspect -f '{{.HostConfig.LogConfig.Type}}' $(XQN)
+	@printf %60s | tr ' ' '-' && echo
+	@curl -v \
+ http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) ):8081
 
 .PHONY: check
 check:
 	@# docker ps -a
 	@#docker-compose logs
 	@echo -n '- IP address: '
-	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQERL_CONTAINER_NAME) 
+	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) 
 	@printf %60s | tr ' ' '-' && echo
-	@curl -v \
- http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQERL_CONTAINER_NAME) ):8081
-	@printf %60s | tr ' ' '-' && echo
-	@docker ps --filter name=$(XQERL_CONTAINER_NAME) --format ' -    name: {{.Names}}'
-	@docker ps --filter name=$(XQERL_CONTAINER_NAME) --format ' -  status: {{.Status}}'
+	@docker ps --filter name=$(XQN) --format ' -    name: {{.Names}}'
+	@docker ps --filter name=$(XQN) --format ' -  status: {{.Status}}'
 	@echo -n '-    port: '
 	@docker ps --format '{{.Ports}}' | grep -oP '^(.+):\K(\d{4})'
 	@#docker volume list 

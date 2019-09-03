@@ -8,5 +8,5 @@ services: docker
 before_install: make network
 install: make build
 before_script: docker-compose up -d
-script: make check
+script: sleep 10; make check
 after_script: docker-compose down
