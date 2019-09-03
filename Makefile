@@ -11,7 +11,7 @@ run-shell:
   --name xq1 \
   --network www \
   --publish 8081:8081 \
-  --log-driver=journald \
+  --log-driver=$(XQERL_LOG_DRIVER) \
   grantmacken/alpine-xqerl:shell
 
 .PHONY: inspect

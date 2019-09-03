@@ -12,8 +12,6 @@ services:
         - type: volume
           source: code
           target: ${XQERL_HOME}/${CODE_DIR}
-    logging:
-        driver: ${XQERL_LOG_DRIVER}
 
 volumes:
   db:

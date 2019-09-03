@@ -24,14 +24,13 @@ RUN apk add --no-cache --virtual .build-deps git \
  && rebar3 as prod release
 
 FROM alpine:3.9 as min
-# Install some libs
-RUN apk add --no-cache openssl && \
-    apk add --no-cache ncurses-libs
-
 COPY --from=rel /home/xqerl/_build/prod/rel/xqerl /usr/local/xqerl
+RUN apk add --no-cache openssl && \
+    apk add --no-cache ncurses-libs \
+    && ln -sf /dev/stdout /usr/local/xqerl/log/erl.log
 ENV XQERL_HOME /usr/local/xqerl
 WORKDIR /usr/local/xqerl
-ENTRYPOINT ["./bin/xqerl","foreground" ]
 EXPOSE 8081
 ENV LANG C.UTF-8
 STOPSIGNAL SIGQUIT
+ENTRYPOINT ["./bin/xqerl","foreground" ]
