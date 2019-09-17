@@ -4,9 +4,12 @@
 FROM erlang:alpine as shell
 # LABEL maintainer="${GIT_USER_NAME} <${GIT_USER_EMAIL}>"
 # Set working directory
+ARG REPO=https://github.com/zadean/xqerl.git
+ARG BRANCH=feature/static-line-numbers
+
 WORKDIR /home
 RUN apk add --no-cache --virtual .build-deps git \
-  && git clone https://github.com/zadean/xqerl.git
+  && git clone --depth=1 --branch ${BRANCH} --progress ${REPO}
 WORKDIR  /home/xqerl
 ENTRYPOINT ["rebar3", "shell"]
 

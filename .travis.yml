@@ -1,5 +1,5 @@
 # Travis yaml grantmacken/alpine-openresty
-# https://github.com/grantmacken/alpine-openresty
+# https://github.com/grantmacken/alpine-xqerl
 sudo: required
 dist: bionic
 os: linux

@@ -12,6 +12,8 @@ make build TARGET=shell
 
 
 
+
+
  
 
 
@@ -35,8 +37,6 @@ run-shell:
 
 .PHONY: inspect
 inspect:
-	@docker inspect -f '{{.HostConfig.LogConfig.Type}}' $(XQN)
-	@printf %60s | tr ' ' '-' && echo
 	@curl -v \
  http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) ):8081
 
@@ -109,6 +109,13 @@ build:
 	@docker build \
   --target="$(if $(TARGET),$(TARGET),min)" \
   --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),v$(DOCKER_TAG))" \
+ .
+
+.PHONY: travis-build
+build:
+	@docker build \
+  --target="$(if $(TARGET),$(TARGET),min)" \
+  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),feature_branch)" \
  .
 
 .PHONY: push
