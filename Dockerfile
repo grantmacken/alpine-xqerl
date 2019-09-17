@@ -5,7 +5,7 @@ FROM erlang:alpine as shell
 # LABEL maintainer="${GIT_USER_NAME} <${GIT_USER_EMAIL}>"
 # Set working directory
 ARG REPO=https://github.com/zadean/xqerl.git
-ARG BRANCH=feature/static-line-numbers
+ARG BRANCH=master
 
 WORKDIR /home
 RUN apk add --no-cache --virtual .build-deps git \

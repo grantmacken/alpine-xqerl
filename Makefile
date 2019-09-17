@@ -40,6 +40,20 @@ inspect:
 	@curl -v \
  http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) ):8081
 
+
+.PHONY: check-error-lines
+check-error-lines:
+	@echo ' - copy xQuery file into container '
+	docker cp fixtures/example.xq $(XQN):/tmp
+	@echo ' - compile an xQuery file'
+	@echo '   should return name of compiled file'
+	$(EVAL) 'xqerl:compile("/tmp/example.xq")'
+	$(EVAL) 'xqerl:run(xqerl:compile("/tmp/example.xq"))'
+	docker cp fixtures/compile-error-example.xq $(XQN):/tmp
+	$(EVAL) 'xqerl:compile("/tmp/compile-error-example.xq")'
+	$(EVAL) 'xqerl:run(xqerl:compile("/tmp/compile-error-example.xq)")'
+
+
 .PHONY: check
 check:
 	@# docker ps -a
@@ -111,11 +125,12 @@ build:
   --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),v$(DOCKER_TAG))" \
  .
 
-.PHONY: travis-build
-build:
+.PHONY: branch-build
+branch-build:
 	@docker build \
   --target="$(if $(TARGET),$(TARGET),min)" \
-  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),feature_branch)" \
+  --build-arg BRANCH=$(XQERL_REPO_BRANCH) \
+  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),v$(DOCKER_TAG))" \
  .
 
 .PHONY: push
