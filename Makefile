@@ -2,7 +2,26 @@ include .env
 XQN=$(XQERL_CONTAINER_NAME)
 EVAL=docker exec $(XQN) ./bin/xqerl eval
 
-default: up
+define mkHelp
+-------------------------------------------------------------------------------
+targets:
+ - to build docker image
+make build 
+ - to build image only to shell target
+make build TARGET=shell
+
+
+
+ 
+
+
+-------------------------------------------------------------------------------
+endef
+
+
+help: export HELP=$(mkHelp)
+help:
+	@echo "$${HELP}"
 
 .PHONY: run-shell
 run-shell:
@@ -16,7 +35,7 @@ run-shell:
 
 .PHONY: inspect
 inspect:
-	docker inspect -f '{{.HostConfig.LogConfig.Type}}' $(XQN)
+	@docker inspect -f '{{.HostConfig.LogConfig.Type}}' $(XQN)
 	@printf %60s | tr ' ' '-' && echo
 	@curl -v \
  http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) ):8081
@@ -57,20 +76,25 @@ check:
 	@echo ' - copy XML file into container '
 	@docker -v cp fixtures/functx_order.xml $(XQN):/tmp
 	@docker exec $(XQN) ls /tmp
-	@echo ' - insert XML into database'
-	@$(EVAL) 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","/tmp/functx_order.xml").'
+	@echo ' - insert XML document into database'
+	$(EVAL) 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","/tmp/functx_order.xml").'
 	@#docker exec $(XQERL_CONTAINER_NAME) cat ./log/erl.log
 	@printf %60s | tr ' ' '-' && echo ''
-	@echo ' - run xQuery expression doc() to fetch form db '
+	@echo ' - run xQuery expression doc() to fetch document from db '
 	$(EVAL) "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
 	@printf %60s | tr ' ' '-' && echo ''
-	@echo ' -  delete database'
+	@echo ' -  delete document in database'
 	$(EVAL) 'xqldb_dml:delete_doc("http://xqerl.org/my_doc.xml").'
 	@printf %60s | tr ' ' '-' && echo ''
-	@echo ' -  try to fetch from database, the deleted file'
+	@echo ' -  try to fetch from database, the deleted document'
 	@echo '    should throw an error'
 	$(EVAL) "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
 	@printf %60s | tr ' ' '=' && echo ''
+
+.PHONY: example
+example:
+	@docker -v cp fixtures/rest.xq $(XQN):/tmp
+	@$(EVAL) 'xqerl:compile("/tmp/rest.xq")'
 
 .PHONY: up
 up:
@@ -83,22 +107,20 @@ down:
 .PHONY: build
 build:
 	@docker build \
-  --target="$(if $(TARGET),$(TARGET),$(DOCKER_TAG))" \
-  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(DOCKER_TAG))" \
-  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(DOCKER_TAG))-$(shell date --iso | sed s/-//g)" \
+  --target="$(if $(TARGET),$(TARGET),min)" \
+  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),v$(DOCKER_TAG))" \
  .
 
 .PHONY: push
 push:
 	@echo '## $@ ##'
-	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(DOCKER_TAG))
-	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(DOCKER_TAG))-$(shell date --iso | sed s/-//g)
+	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),v$(DOCKER_TAG))
 
 .PHONY: clean
 clean:
 	@docker image prune -a
 	@docker container prune
-	@docker images -a | grep "xqerl" | awk '{print $3}'
+	@docker rmi $$(docker images -a | grep "xqerl" | awk '{print $$3}')
 
 .PHONY: travis
 travis: 
