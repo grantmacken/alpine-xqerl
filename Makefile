@@ -44,14 +44,26 @@ inspect:
 .PHONY: check-error-lines
 check-error-lines:
 	@echo ' - copy xQuery file into container '
-	docker cp fixtures/example.xq $(XQN):/tmp
-	@echo ' - compile an xQuery file'
-	@echo '   should return name of compiled file'
-	$(EVAL) 'xqerl:compile("/tmp/example.xq")'
-	$(EVAL) 'xqerl:run(xqerl:compile("/tmp/example.xq"))'
-	docker cp fixtures/compile-error-example.xq $(XQN):/tmp
-	$(EVAL) 'xqerl:compile("/tmp/compile-error-example.xq")'
-	$(EVAL) 'xqerl:run(xqerl:compile("/tmp/compile-error-example.xq)")'
+	@docker exec $(XQN) rm -v -rf /tmp/fixtures 
+	@docker cp fixtures $(XQN):/tmp/fixtures
+	@#docker exec $(XQN) ls /tmp
+	@echo ' - compile and run an xQuery file'
+	$(EVAL) 'xqerl:run(xqerl:compile("/tmp/fixtures/example.xq"))'
+	@echo ' - try to compile xQuery with a static error  '
+	@echo '   should be able to grep *type* error code XPST0081'
+	$(EVAL) 'xqerl:compile("/tmp/fixtures/XPST0081.xq")' | grep -oP 'XPST0081'
+	@echo '   should be able to grep error message'
+	$(EVAL) 'xqerl:compile("/tmp/fixtures/XPST0081.xq")' | grep -oP '.+\K"It is a static(.+)">>'
+	@echo '  TODO should be able to grep error "file path"'
+	@echo '  TODO should be able to grep error "line number"'
+
+xxx:
+	@echo '   should return  *type* error XPTY0004'
+	@$(EVAL) 'xqerl:compile("/tmp/fixtures/XPTY0004.xq")' | grep -oP 'XPTY0004'
+	@echo '   should return  *static* error' 'XQST0076'
+	@$(EVAL) 'xqerl:compile("/tmp/fixtures/XQST0076.xq")' | grep -oP 'XQST0076'
+	@echo '   should return  *static* error' 'XQST0076 with associated error line number'
+	@$(EVAL) 'xqerl:compile("/tmp/fixtures/XQST0076.xq")' | grep -oP 'XQST0076'
 
 
 .PHONY: check

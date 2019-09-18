@@ -5,6 +5,5 @@ function local:f1( $hey ) {
 
 (
 local:f1('my my')
-
 )
 
