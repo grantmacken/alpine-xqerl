@@ -40,7 +40,6 @@ inspect:
 	@curl -v \
  http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) ):8081
 
-
 .PHONY: check-error-lines
 check-error-lines:
 	@echo ' - copy xQuery file into container '
