@@ -56,6 +56,10 @@ check-error-lines:
 	$(EVAL) 'xqerl:compile("/tmp/fixtures/XPST0081.xq")' | grep -oP '.+\K"It is a static(.+)">>'
 	@echo '  TODO should be able to grep error "file path"'
 	@echo '  TODO should be able to grep error "line number"'
+	@echo ' - show compile output from example XPST0081.xq'
+	$(EVAL) 'xqerl:compile("/tmp/fixtures/XPST0081.xq")'
+	@echo '  '
+
 
 xxx:
 	@echo '   should return  *type* error XPTY0004'
