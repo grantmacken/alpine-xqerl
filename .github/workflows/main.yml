@@ -4,10 +4,14 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v1
     - name: Build Docker Image
       run: make build
+    - name: Bring up docker container
+      run: make up
+    - uses: "maddox/actions/sleep@master"
+    - name: Sleep
+    - name: Take down docker container
+      run: make down
