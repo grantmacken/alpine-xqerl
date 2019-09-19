@@ -10,7 +10,9 @@ jobs:
     - name: Build Docker Image
       run: make build
     - name: Bring up docker container
-      run: make up
+      run: |
+          make network
+          make up
     - uses: "maddox/actions/sleep@master"
     - name: Sleep
       args: 5
