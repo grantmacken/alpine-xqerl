@@ -84,6 +84,8 @@ fixtures/%.err: tmp/%.txt
 
 tmp/%.txt: fixtures/%.xq
 	@printf %60s | tr ' ' '-' && echo ''
+	@cat $<
+	@printf %60s | tr ' ' '-' && echo ''
 	@mkdir -p ./tmp
 	@echo ' copy "$<" into container '
 	@docker exec $(XQN) mkdir -p /tmp/fixtures 
