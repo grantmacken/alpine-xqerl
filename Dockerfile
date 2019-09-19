@@ -5,8 +5,10 @@ FROM erlang:alpine as shell
 # LABEL maintainer="${GIT_USER_NAME} <${GIT_USER_EMAIL}>"
 # Set working directory
 WORKDIR /home
+COPY .env ./
 RUN apk add --no-cache --virtual .build-deps git \
-  && git clone https://github.com/zadean/xqerl.git
+  && source .env \
+  && git clone --depth=1 --branch ${REPO_BRANCH} --progress ${REPO_URI}
 WORKDIR  /home/xqerl
 ENTRYPOINT ["rebar3", "shell"]
 

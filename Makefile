@@ -73,6 +73,8 @@ check:
 	@echo '   should return query result as XML'
 	$(EVAL) 'S = xqerl:compile("/tmp/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
 	@printf %60s | tr ' ' '-' && echo ''
+
+xxxxx:
 	@echo ' - copy XML file into container '
 	@docker -v cp fixtures/functx_order.xml $(XQN):/tmp
 	@docker exec $(XQN) ls /tmp
