@@ -13,8 +13,6 @@ jobs:
       run: |
           make network
           make up
-    - uses: "maddox/actions/sleep@master"
-    - name: Sleep
-      args: 5
+          sleep 5
     - name: Take down docker container
       run: make down
