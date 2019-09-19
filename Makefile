@@ -40,33 +40,58 @@ inspect:
 	@curl -v \
  http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) ):8081
 
-.PHONY: check-error-lines
-check-error-lines:
-	@echo ' - copy xQuery file into container '
-	@docker exec $(XQN) rm -v -rf /tmp/fixtures 
-	@docker cp fixtures $(XQN):/tmp/fixtures
-	@#docker exec $(XQN) ls /tmp
-	@echo ' - compile and run an xQuery file'
-	$(EVAL) 'xqerl:run(xqerl:compile("/tmp/fixtures/example.xq"))'
-	@echo ' - try to compile xQuery with a static error  '
-	@echo '   should be able to grep *type* error code XPST0081'
-	$(EVAL) 'xqerl:compile("/tmp/fixtures/XPST0081.xq")' | grep -oP 'XPST0081'
-	@echo '   should be able to grep error message'
-	$(EVAL) 'xqerl:compile("/tmp/fixtures/XPST0081.xq")' | grep -oP '.+\K"It is a static(.+)">>'
-	@echo '  TODO should be able to grep error "file path"'
-	@echo '  TODO should be able to grep error "line number"'
-	@echo ' - show compile output from example XPST0081.xq'
-	$(EVAL) 'xqerl:compile("/tmp/fixtures/XPST0081.xq")'
-	@echo '  '
 
+# https://www.w3.org/2005/xqt-errors/
+#https://www.w3.org/TR/xpath-30/
 
-xxx:
-	@echo '   should return  *type* error XPTY0004'
-	@$(EVAL) 'xqerl:compile("/tmp/fixtures/XPTY0004.xq")' | grep -oP 'XPTY0004'
-	@echo '   should return  *static* error' 'XQST0076'
-	@$(EVAL) 'xqerl:compile("/tmp/fixtures/XQST0076.xq")' | grep -oP 'XQST0076'
-	@echo '   should return  *static* error' 'XQST0076 with associated error line number'
-	@$(EVAL) 'xqerl:compile("/tmp/fixtures/XQST0076.xq")' | grep -oP 'XQST0076'
+# err denotes the namespace for XPath and XQuery errors, http://www.w3.org/2005/xqt-errors. 
+# This binding of the namespace prefix err is used for convenience in this document, and is not normative.
+# XX denotes the language in which the error is defined, using the following encoding:
+#     XP denotes an error defined by XPath. Such an error may also occur XQuery since XQuery includes XPath as a subset.
+#     XQ denotes an error defined by XQuery (or an error originally defined by XQuery and later added to XPath).
+# YY denotes the error category, using the following encoding:
+#     ST denotes a static error.
+#     DY denotes a dynamic error.
+#     TY denotes a type error.
+# nnnn is a unique numeric code.
+
+getErrPath = $(shell grep -oP '<<"file:///tmp/\K(.+)(?=">>)' $1)
+getErrLine = $(shell grep -oP '<<"file(.+)(">>,\K[\d+])' $1)
+getErrDesc = $(shell grep -oP '^(\s)+<<"\K([A-Z].+)(?=")' $1)
+getErrCode= $(shell grep -oP '<<"err">>,<<"\K(.+)(?=")' $1)
+errFormat = $(call getErrPath, $1):$(call getErrLine, $1):0:E: $(call getErrDesc, $1)
+
+SRC_ERR := $(wildcard fixtures/X*.xq)
+
+check-error-lines: $(patsubst %.xq,%.err,$(SRC_ERR)) 
+
+fixtures/%.err: tmp/%.txt
+	@printf %60s | tr ' ' '-' && echo ''
+	@cat $(<)
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo ' if error should be able to ...'
+	@echo -n ' - grep error "code":        [ '
+	@echo $(call getErrCode,$(<)) ]
+	@echo -n ' - grep error "line-number": [ '
+	@echo $(call getErrLine,$(<)) ]
+	@echo -n ' - map "relative-path" :    [ '
+	@echo $(call getErrPath,$(<)) ]
+	@echo ' - grep error "description": ... '
+	@echo $(call getErrDesc,$(<)) | fold -s -w 80
+	@echo ' - produce one line "error-format": ... '
+	@echo $(call errFormat,$(<))
+	@printf %60s | tr ' ' '=' && echo ''
+
+tmp/%.txt: fixtures/%.xq
+	@printf %60s | tr ' ' '-' && echo ''
+	@mkdir -p ./tmp
+	@echo ' copy "$<" into container '
+	@docker exec $(XQN) mkdir -p /tmp/fixtures 
+	@docker cp $(<) $(XQN):/tmp/fixtures
+	@echo ' try to compile xQuery with a known error  '
+	@$(EVAL) 'xqerl:compile("/tmp/$(<)")' > $@
+	@printf %60s | tr ' ' '-' && echo ''
+
 
 
 .PHONY: check
@@ -120,10 +145,7 @@ check:
 	$(EVAL) "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
 	@printf %60s | tr ' ' '=' && echo ''
 
-.PHONY: example
-example:
-	@docker -v cp fixtures/rest.xq $(XQN):/tmp
-	@$(EVAL) 'xqerl:compile("/tmp/rest.xq")'
+
 
 .PHONY: up
 up:
@@ -137,14 +159,6 @@ down:
 build:
 	@docker build \
   --target="$(if $(TARGET),$(TARGET),min)" \
-  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),v$(DOCKER_TAG))" \
- .
-
-.PHONY: branch-build
-branch-build:
-	@docker build \
-  --target="$(if $(TARGET),$(TARGET),min)" \
-  --build-arg BRANCH=$(XQERL_REPO_BRANCH) \
   --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),v$(DOCKER_TAG))" \
  .
 
