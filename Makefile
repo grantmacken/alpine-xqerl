@@ -83,7 +83,7 @@ fixtures/%.err: tmp/%.txt
 	@printf %60s | tr ' ' '=' && echo ''
 
 tmp/%.txt: fixtures/%.xq
-	@printf %60s | tr ' ' '-' && echo ''
+	@printf %60s | tr ' ' '#' && echo ''
 	@cat $<
 	@printf %60s | tr ' ' '-' && echo ''
 	@mkdir -p ./tmp
