@@ -54,12 +54,23 @@ inspect:
 #     DY denotes a dynamic error.
 #     TY denotes a type error.
 # nnnn is a unique numeric code.
-
+#
 getErrPath = $(shell grep -oP '<<"file:///tmp/\K(.+)(?=">>)' $1)
 getErrLine = $(shell grep -oP '<<"file(.+)(">>,\K[\d+])' $1)
 getErrDesc = $(shell grep -oP '^(\s)+<<"\K([A-Z].+)(?=")' $1)
 getErrCode= $(shell grep -oP '<<"err">>,<<"\K(.+)(?=")' $1)
 errFormat = $(call getErrPath, $1):$(call getErrLine, $1):0:E: $(call getErrDesc, $1)
+errPrefix = $(if $(findstring XP,$(call getErrCode,$1)),\
+ 'XPath',\
+  $(if $(findstring XQ,$(call getErrCode,$1)),\
+ 'XQuery',))
+
+errSuffix = $(if $(findstring ST,$(call getErrCode,$1)),\
+ 'static error defined by',\
+  $(if $(findstring DY,$(call getErrCode,$1)),\
+ 'dynamic error defined by', \
+  $(if $(findstring TY,$(call getErrCode,$1)),\
+ 'type error defined by',)))
 
 SRC_ERR := $(wildcard fixtures/X*.xq)
 
@@ -68,6 +79,8 @@ check-error-lines: $(patsubst %.xq,%.err,$(SRC_ERR))
 fixtures/%.err: tmp/%.txt
 	@printf %60s | tr ' ' '-' && echo ''
 	@cat $(<)
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo $(call getErrCode,$(<)) - $(call errSuffix, $(<)) $(call errPrefix, $(<)) 
 	@printf %60s | tr ' ' '-' && echo ''
 	@echo ' if error should be able to ...'
 	@echo -n ' - grep error "code":        [ '
@@ -85,14 +98,13 @@ fixtures/%.err: tmp/%.txt
 tmp/%.txt: fixtures/%.xq
 	@printf %60s | tr ' ' '#' && echo ''
 	@cat $<
-	@printf %60s | tr ' ' '-' && echo ''
+	@printf %60s | tr ' ' '#' && echo ''
 	@mkdir -p ./tmp
 	@echo ' copy "$<" into container '
 	@docker exec $(XQN) mkdir -p /tmp/fixtures 
 	@docker cp $(<) $(XQN):/tmp/fixtures
 	@echo ' try to compile xQuery with a known error  '
 	@$(EVAL) 'xqerl:compile("/tmp/$(<)")' > $@
-	@printf %60s | tr ' ' '-' && echo ''
 
 
 
