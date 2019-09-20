@@ -40,10 +40,8 @@ inspect:
 	@curl -v \
  http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) ):8081
 
-.PHONY: check
-check:
-	@# docker ps -a
-	@#docker-compose logs
+.PHONY: info
+info:
 	@echo -n '- IP address: '
 	@docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) 
 	@printf %60s | tr ' ' '-' && echo
@@ -51,11 +49,12 @@ check:
 	@docker ps --filter name=$(XQN) --format ' -  status: {{.Status}}'
 	@echo -n '-    port: '
 	@docker ps --format '{{.Ports}}' | grep -oP '^(.+):\K(\d{4})'
-	@#docker volume list 
 	@docker volume list   --format ' -  volume: {{.Name}}'
 	@docker network list --filter name=$(NETWORK) --format ' - network: {{.Name}}'
 	@echo -n '- started: '
 	@$(EVAL) 'application:ensure_all_started(xqerl).'
+
+check:
 	@printf %60s | tr ' ' '=' && echo 
 	@echo ' - run a query '
 	$(EVAL) 'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'

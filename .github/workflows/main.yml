@@ -9,10 +9,14 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build Docker Image
       run: make build
-    - name: Bring up docker container
+    - name: Bring up docker container and display container info
       run: |
           make network
           make up
           sleep 5
+          make info
+    - name: Container Tests
+      run: |
+          echo 'todo'
     - name: Take down docker container
       run: make down
