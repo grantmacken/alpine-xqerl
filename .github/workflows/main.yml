@@ -25,11 +25,12 @@ jobs:
           'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
           printf %60s | tr ' ' '-' && echo ''
           echo '  - copy xQuery files into container ' \
-          && docker cp -v ./fixtures xq:/tmp
+          && docker cp ./fixtures xq:/tmp
           printf %60s | tr ' ' '-' && echo ''
           echo '  - list copied container files' \
           docker exec xq ls /tmp
-     
-
     - name: Take down docker container
       run: make down
+    - name: Docker Login
+      run: echo ${{ secrets.D }}
+        
