@@ -21,7 +21,9 @@ jobs:
           make info
     - name: Smoke Tests
       run: |
-          make check
+          make check-can-run-expression
+          check-copy-into-container
+          make check-can-compile
     - name: Take down docker container
       run: make down
     # - name: Docker Login In and Push to dockerhub 

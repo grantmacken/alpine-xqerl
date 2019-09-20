@@ -54,27 +54,35 @@ info:
 	@echo -n '- started: '
 	@$(EVAL) 'application:ensure_all_started(xqerl).'
 
-check:
+check-can-run-expression:
 	@printf %60s | tr ' ' '=' && echo 
-	@echo ' - run a query '
-	$(EVAL) 'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
-	@printf %60s | tr ' ' '-' && echo ''
-	@echo ' - copy xQuery file into container '
-	docker cp fixtures/sudoku2.xq $(XQN):/tmp
-	@echo ' - list files in tmp'
-	@docker exec $(XQN) ls /tmp
-	@printf %60s | tr ' ' '-' && echo ''
+	@echo ' - run a xQuery expression'
+	@$(EVAL) \
+ 'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").' | grep -oP '^\[\{xq.+$$'
+
+
+check-copy-into-container:
+	@printf %60s | tr ' ' '=' && echo 
+	@#docker exec $(XQN) rm -fr /tmp/
+	@docker cp fixtures $(XQN):/tmp
+	docker exec $(XQN) ls /tmp/fixtures
+	@#docker exec $(XQN) rm -rf /tmp/fixtures
+
+
+check-can-compile:
+	@printf %60s | tr ' ' '=' && echo 
 	@echo ' - compile an xQuery file'
 	@echo '   should return name of compiled file'
-	$(EVAL) 'xqerl:compile("/tmp/sudoku2.xq")'
+	$(EVAL) 'xqerl:compile("/tmp/fixtures/example.xq")'
 	@printf %60s | tr ' ' '-' && echo 
 	@echo ' - compile an xQuery file then run query'
-	@echo '   should return query result as XML'
-	$(EVAL) 'S = xqerl:compile("/tmp/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
+	@echo '   should return query result'
+	$(EVAL) 'xqerl:run(xqerl:compile("/tmp/fixtures/example.xq"))'
 	@printf %60s | tr ' ' '-' && echo ''
 
 # printf %60s | tr ' ' '-' && echo ''
 #
+# $(EVAL) 'S = xqerl:compile("/tmp/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
 #      echo    ' - compile and run example xQuery' \
 #      && echo '   should return some text ' \
 #      && docker exec xq ./bin/xqerl eval \
