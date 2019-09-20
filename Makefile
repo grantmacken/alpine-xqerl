@@ -138,9 +138,9 @@ check-can-GET-restXQ-route:
 	@printf %60s | tr ' ' '-' && echo ''
 	@#docker cp fixtures $(XQN):/tmp
 	@# $(EVAL) 'xqerl:compile("/tmp/fixtures/rest.xq")'
-	@w3m -dump $(Address)
+	@curl -v $(Address)
 	@printf %60s | tr ' ' '-' && echo ''
-	@w3m -dump $(Address)/route/detail?id=a
+	@curl -v $(Address)/route/detail?id=a
 	@printf %60s | tr ' ' '-' && echo ''
 	@printf %60s | tr ' ' '-' && echo ''
 
