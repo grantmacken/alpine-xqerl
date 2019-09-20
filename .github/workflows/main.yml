@@ -25,12 +25,13 @@ jobs:
           'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
           printf %60s | tr ' ' '-' && echo ''
           echo '  - copy xQuery files into container ' \
-          && docker cp ./fixtures xq:/tmp
+          && docker exec xq mkdir -p /tmp/fixtures
+          && docker cp ./fixtures xq:/tmp/fixtures
           printf %60s | tr ' ' '-' && echo ''
           echo '  - list copied container files' \
           docker exec xq ls /tmp
     - name: Take down docker container
       run: make down
-    - name: Docker Login
-      run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
-        
+    # - name: Docker Login In and Push to dockerhub 
+    #   run:  echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin 
+    # - name: make push
