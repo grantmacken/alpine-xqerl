@@ -60,7 +60,6 @@ check-can-run-expression:
 	@$(EVAL) \
  'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").' | grep -oP '^\[\{xq.+$$'
 
-
 check-copy-into-container:
 	@printf %60s | tr ' ' '=' && echo 
 	@#docker exec $(XQN) rm -fr /tmp/
@@ -68,9 +67,8 @@ check-copy-into-container:
 	docker exec $(XQN) ls /tmp/fixtures
 	@#docker exec $(XQN) rm -rf /tmp/fixtures
 
-
 check-can-compile:
-	@printf %60s | tr ' ' '=' && echo 
+	@printf %60s | tr ' ' '-' && echo 
 	@echo ' - compile an xQuery file'
 	@echo '   should return name of compiled file'
 	$(EVAL) 'xqerl:compile("/tmp/fixtures/example.xq")'
@@ -78,6 +76,25 @@ check-can-compile:
 	@echo ' - compile an xQuery file then run query'
 	@echo '   should return query result'
 	$(EVAL) 'xqerl:run(xqerl:compile("/tmp/fixtures/example.xq"))'
+	@printf %60s | tr ' ' '-' && echo ''
+
+
+check-can-use-external:
+	@printf %60s | tr ' ' '=' && echo 
+	@docker cp fixtures $(XQN):/tmp
+	@printf %60s | tr ' ' '-' && echo 
+	@echo ' - compile an xQuery file then run query'
+	@echo '   passing an external arg "hey hey" to the compiled xQuery'
+	$(EVAL) 'J = xqerl:compile("/tmp/fixtures/example2.xq"),C = #{<<"msg">> => <<"hey hey">>},J:main(C).'
+	@printf %60s | tr ' ' '-' && echo ''
+
+check-can-use-node-to-xml:
+	@printf %60s | tr ' ' '=' && echo 
+	@docker cp fixtures $(XQN):/tmp
+	@printf %60s | tr ' ' '-' && echo 
+	@echo ' - compile an xQuery file then run query'
+	@echo '   passing an external arg "hey hey" to the compiled xQuery'
+	$(EVAL) 'S = xqerl:compile("/tmp/fixtures/sudoku2.xq"),io:format(xqerl_node:to_xml(S:main(#{}))).'
 	@printf %60s | tr ' ' '-' && echo ''
 
 # printf %60s | tr ' ' '-' && echo ''
