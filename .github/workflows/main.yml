@@ -25,15 +25,15 @@ jobs:
           'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
           printf %60s | tr ' ' '-' && echo ''
           echo '  - copy xQuery files into container ' \
-          && docker cp fixtures xq:/tmp
+          && docker cp ./fixtures xq:/tmp/.
           printf %60s | tr ' ' '-' && echo ''
           echo '  - list copied container files' \
-          docker exec xq ls /tmp/fixtures
+          docker exec xq ls /tmp
           printf %60s | tr ' ' '-' && echo ''
           echo    ' - compile and run example xQuery' \
           && echo '   should return some text ' \
           && docker exec xq ./bin/xqerl eval \
-          'xqerl:compile("/tmp/fixtures/example.xq")'
+          'xqerl:compile("/tmp/example.xq")'
           printf %60s | tr ' ' '-' && echo ''
 
     - name: Take down docker container
