@@ -31,6 +31,11 @@ jobs:
           && docker exec xq ./bin/xqerl eval \
           'xqerl:compile("/tmp/sudoku2.xq")'
           printf %60s | tr ' ' '-' && echo ''
+          echo    ' - compile and run xQuery' \
+          && echo '  should return query result as XML ' \
+          && docker exec xq ./bin/xqerl eval \
+          'S = xqerl:compile("/tmp/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
+          printf %60s | tr ' ' '-' && echo ''
 
     - name: Take down docker container
       run: make down
