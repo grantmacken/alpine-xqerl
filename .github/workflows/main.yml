@@ -18,7 +18,7 @@ jobs:
       run: |
           echo run basic xQuery expression
           docker exec xq ./bin/xqerl eval \
- 'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
+          'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
           printf %60s | tr ' ' '-' && echo ''
     - name: Take down docker container
       run: make down
