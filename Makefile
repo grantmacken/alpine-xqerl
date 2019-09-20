@@ -60,12 +60,14 @@ info:
 
 check-can-run-expression:
 	@printf %60s | tr ' ' '=' && echo 
+	@echo '## $@ ##'
 	@echo ' - run a xQuery expression'
 	@$(EVAL) \
  'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").' | grep -oP '^\[\{xq.+$$'
 
 check-copy-into-container:
 	@printf %60s | tr ' ' '=' && echo 
+	@echo '## $@ ##'
 	@#docker exec $(XQN) rm -fr /tmp/
 	@docker cp fixtures $(XQN):/tmp
 	docker exec $(XQN) ls /tmp/fixtures
@@ -73,6 +75,7 @@ check-copy-into-container:
 
 check-can-compile:
 	@printf %60s | tr ' ' '-' && echo 
+	@echo '## $@ ##'
 	@echo ' - compile an xQuery file'
 	@echo '   should return name of compiled file'
 	$(EVAL) 'xqerl:compile("/tmp/fixtures/example.xq")'
@@ -80,10 +83,10 @@ check-can-compile:
 	@echo ' - compile an xQuery file then run query'
 	@echo '   should return query result'
 	$(EVAL) 'io:format(xqerl:run(xqerl:compile("/tmp/fixtures/example.xq")))'
-	@printf %60s | tr ' ' '-' && echo ''
 
 check-can-use-external:
 	@printf %60s | tr ' ' '=' && echo 
+	@echo '## $@ ##'
 	@docker cp fixtures $(XQN):/tmp
 	@printf %60s | tr ' ' '-' && echo 
 	@echo ' - compile an xQuery file then run query'
@@ -93,21 +96,22 @@ check-can-use-external:
 
 check-can-use-node-to-xml:
 	@printf %60s | tr ' ' '=' && echo 
-	@docker cp fixtures $(XQN):/tmp
-	@printf %60s | tr ' ' '-' && echo 
+	@echo '## $@ ##'
 	@echo ' - compile an xQuery file then run query'
-	@echo '   should output xml'
-	$(EVAL) 'S = xqerl:compile("/tmp/fixtures/sudoku2.xq"),io:format(xqerl_node:to_xml(S:main(#{}))).'
-	@printf %60s | tr ' ' '-' && echo ''
+	@echo '   should output xml, should be able to then grep title'
+	@$(EVAL) 'S = xqerl:compile("/tmp/fixtures/sudoku2.xq"),io:format(xqerl_node:to_xml(S:main(#{}))).' | \
+ grep -oP '<title>(.+)</title>'
 
 check-can-load-data-into-db:
 	@printf %60s | tr ' ' '-' && echo ''
+	@echo '## $@ ##'
 	@echo ' - insert XML document into database'
 	$(EVAL) 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","/tmp/fixtures/functx_order.xml").' || true
 	@printf %60s | tr ' ' '-' && echo ''
 
 check-can-load-data-from-db:
 	@printf %60s | tr ' ' '-' && echo ''
+	@echo '## $@ ##'
 	@echo ' - run xQuery expression doc() to fetch document from db '
 	$(EVAL) "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
 	@printf %60s | tr ' ' '-' && echo ''
@@ -129,16 +133,20 @@ todoxxx:
 
 check-can-set-restXQ-routes:
 	@printf %60s | tr ' ' '-' && echo ''
+	@echo '## $@ ##'
 	@docker cp fixtures $(XQN):/tmp
 	@$(EVAL) 'xqerl:compile("/tmp/fixtures/rest.xq")'
 	@curl -v $(Address)/insert
-	@printf %60s | tr ' ' '-' && echo ''
 
 check-can-GET-restXQ-route:
 	@printf %60s | tr ' ' '-' && echo ''
-	@#docker cp fixtures $(XQN):/tmp
-	@# $(EVAL) 'xqerl:compile("/tmp/fixtures/rest.xq")'
-	@curl -v $(Address)
+	@echo '## $@ ##'
+	@curl -s $(Address) | grep -oP '<th>(.+)</th>'
+	@printf %60s | tr ' ' '-' && echo ''
+	@curl -s $(Address)/route/detail?id=a | grep -oP '<th>(.+)</th>'
+
+xxxx:
+	grep -oP '<title>(.+)</title>'
 	@printf %60s | tr ' ' '-' && echo ''
 	@curl -v $(Address)/route/detail?id=a
 	@printf %60s | tr ' ' '-' && echo ''
