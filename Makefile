@@ -75,7 +75,7 @@ check-can-compile:
 	@printf %60s | tr ' ' '-' && echo 
 	@echo ' - compile an xQuery file then run query'
 	@echo '   should return query result'
-	$(EVAL) 'xqerl:run(xqerl:compile("/tmp/fixtures/example.xq"))'
+	$(EVAL) 'io:format(xqerl:run(xqerl:compile("/tmp/fixtures/example.xq")))'
 	@printf %60s | tr ' ' '-' && echo ''
 
 
@@ -85,7 +85,7 @@ check-can-use-external:
 	@printf %60s | tr ' ' '-' && echo 
 	@echo ' - compile an xQuery file then run query'
 	@echo '   passing an external arg "hey hey" to the compiled xQuery'
-	$(EVAL) 'J = xqerl:compile("/tmp/fixtures/example2.xq"),C = #{<<"msg">> => <<"hey hey">>},J:main(C).'
+	$(EVAL) 'J = xqerl:compile("/tmp/fixtures/example2.xq"),C = #{<<"msg">> => <<"hey hey">>},io:format(J:main(C)).'
 	@printf %60s | tr ' ' '-' && echo ''
 
 check-can-use-node-to-xml:

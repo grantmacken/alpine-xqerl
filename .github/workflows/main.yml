@@ -22,8 +22,11 @@ jobs:
     - name: Smoke Tests
       run: |
           make check-can-run-expression
-          check-copy-into-container
+          make check-copy-into-container
           make check-can-compile
+          make check-can-use-external
+          make check-can-use-node-to-xml
+
     - name: Take down docker container
       run: make down
     # - name: Docker Login In and Push to dockerhub 
