@@ -14,11 +14,23 @@ jobs:
           make network
           make up
           sleep 5
-    - name: Container Tests
+    - name: Smoke Tests
       run: |
-          echo run basic xQuery expression
-          docker exec xq ./bin/xqerl eval \
+          echo ' - run basic xQuery expression' \
+          && docker exec xq ./bin/xqerl eval \
           'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
           printf %60s | tr ' ' '-' && echo ''
+          echo '  - copy xQuery file into container ' \
+          && docker cp fixtures/sudoku2.xq xq:/tmp
+          printf %60s | tr ' ' '-' && echo ''
+          echo '  - list copied container file' \
+          docker exec xq ls /tmp
+          printf %60s | tr ' ' '-' && echo ''
+          echo    ' - compile an xQuery file' \
+          && echo '  should return name of compiled file' \
+          && docker exec xq ./bin/xqerl eval \
+          'xqerl:compile("/tmp/sudoku2.xq")'
+          printf %60s | tr ' ' '-' && echo ''
+
     - name: Take down docker container
       run: make down
