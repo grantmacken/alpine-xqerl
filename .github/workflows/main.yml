@@ -19,7 +19,7 @@ jobs:
           make up
           sleep 5
           make info
-    - name: Smoke Tests
+    - name: Some Can Do Tests
       run: |
           make check-can-run-expression
           make check-copy-into-container

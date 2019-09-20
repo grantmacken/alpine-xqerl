@@ -135,7 +135,9 @@ check-can-set-restXQ-routes:
 	@printf %60s | tr ' ' '-' && echo ''
 	@echo '## $@ ##'
 	@docker cp fixtures $(XQN):/tmp
+	@echo ' -  compile restXQ function to run on the beam'
 	@$(EVAL) 'xqerl:compile("/tmp/fixtures/rest.xq")'
+	@echo ' -  use restXQ defined endpoint to insert data in db'
 	@curl -v $(Address)/insert
 
 check-can-GET-restXQ-route:
