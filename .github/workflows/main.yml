@@ -18,18 +18,10 @@ jobs:
           make network
           make up
           sleep 5
+          make info
     - name: Smoke Tests
       run: |
-          echo ' - run basic xQuery expression' \
-          && docker exec xq ./bin/xqerl eval \
-          'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
-          printf %60s | tr ' ' '-' && echo ''
-          echo '  - copy xQuery files into container ' \
-          && docker exec xq mkdir -p /tmp/fixtures \
-          && docker cp ./fixtures xq:/tmp/fixtures
-          printf %60s | tr ' ' '-' && echo ''
-          echo '  - list copied container files' \
-          docker exec xq ls /tmp
+          make check
     - name: Take down docker container
       run: make down
     # - name: Docker Login In and Push to dockerhub 
