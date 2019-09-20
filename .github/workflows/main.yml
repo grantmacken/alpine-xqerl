@@ -26,6 +26,8 @@ jobs:
           make check-can-compile
           make check-can-use-external
           make check-can-use-node-to-xml
+          make check-can-set-restXQ-routes
+          make check-can-GET-restXQ-route
 
     - name: Take down docker container
       run: make down

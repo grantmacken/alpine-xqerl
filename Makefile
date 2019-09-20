@@ -2,6 +2,9 @@ include .env
 XQN=$(XQERL_CONTAINER_NAME)
 EVAL=docker exec $(XQN) ./bin/xqerl eval
 
+
+Address = http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) ):8081
+
 define mkHelp
 -------------------------------------------------------------------------------
 targets:
@@ -17,6 +20,7 @@ make build TARGET=shell
 
 -------------------------------------------------------------------------------
 endef
+
 
 
 help: export HELP=$(mkHelp)
@@ -78,7 +82,6 @@ check-can-compile:
 	$(EVAL) 'io:format(xqerl:run(xqerl:compile("/tmp/fixtures/example.xq")))'
 	@printf %60s | tr ' ' '-' && echo ''
 
-
 check-can-use-external:
 	@printf %60s | tr ' ' '=' && echo 
 	@docker cp fixtures $(XQN):/tmp
@@ -93,41 +96,24 @@ check-can-use-node-to-xml:
 	@docker cp fixtures $(XQN):/tmp
 	@printf %60s | tr ' ' '-' && echo 
 	@echo ' - compile an xQuery file then run query'
-	@echo '   passing an external arg "hey hey" to the compiled xQuery'
+	@echo '   should output xml'
 	$(EVAL) 'S = xqerl:compile("/tmp/fixtures/sudoku2.xq"),io:format(xqerl_node:to_xml(S:main(#{}))).'
 	@printf %60s | tr ' ' '-' && echo ''
 
-# printf %60s | tr ' ' '-' && echo ''
-#
-# $(EVAL) 'S = xqerl:compile("/tmp/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
-#      echo    ' - compile and run example xQuery' \
-#      && echo '   should return some text ' \
-#      && docker exec xq ./bin/xqerl eval \
-#      'xqerl:compile("/tmp/example.xq")'
-#      printf %60s | tr ' ' '-' && echo ''
-# echo '  - copy xQuery file into container ' \
-# && docker cp fixtures/sudoku2.xq xq:/tmp
-# printf %60s | tr ' ' '-' && echo ''
-# echo '  - list copied container file' \
-# docker exec xq ls /tmp
-# printf %60s | tr ' ' '-' && echo ''
-# echo    ' - compile an xQuery file' \
-# && echo '   should return name of compiled file' \
-# && docker exec xq ./bin/xqerl eval \
-# 'xqerl:compile("/tmp/sudoku2.xq")'
-# printf %60s | tr ' ' '-' && echo ''
-# echo    ' - compile and run xQuery' \
-# && echo '   should return query result as XML ' \
-# && docker exec xq ./bin/xqerl eval \
-# 'S = xqerl:compile("/tmp/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
-# printf %60s | tr ' ' '-' && echo ''
-
-xxxxx:
-	@echo ' - copy XML file into container '
-	@docker -v cp fixtures/functx_order.xml $(XQN):/tmp
-	@docker exec $(XQN) ls /tmp
+check-can-load-data-into-db:
+	@printf %60s | tr ' ' '-' && echo ''
 	@echo ' - insert XML document into database'
-	$(EVAL) 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","/tmp/functx_order.xml").'
+	$(EVAL) 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","/tmp/fixtures/functx_order.xml").' || true
+	@printf %60s | tr ' ' '-' && echo ''
+
+check-can-load-data-from-db:
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo ' - run xQuery expression doc() to fetch document from db '
+	$(EVAL) "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
+	@printf %60s | tr ' ' '-' && echo ''
+
+todoxxx:
+	@printf %60s | tr ' ' '-' && echo ''
 	@#docker exec $(XQERL_CONTAINER_NAME) cat ./log/erl.log
 	@printf %60s | tr ' ' '-' && echo ''
 	@echo ' - run xQuery expression doc() to fetch document from db '
@@ -141,10 +127,22 @@ xxxxx:
 	$(EVAL) "xqerl_node:to_xml(xqerl:run(\"doc('http://xqerl.org/my_doc.xml')\"))."
 	@printf %60s | tr ' ' '=' && echo ''
 
-.PHONY: example
-example:
-	@docker -v cp fixtures/rest.xq $(XQN):/tmp
-	@$(EVAL) 'xqerl:compile("/tmp/rest.xq")'
+check-can-set-restXQ-routes:
+	@printf %60s | tr ' ' '-' && echo ''
+	@docker cp fixtures $(XQN):/tmp
+	@$(EVAL) 'xqerl:compile("/tmp/fixtures/rest.xq")'
+	@curl -v $(Address)/insert
+	@printf %60s | tr ' ' '-' && echo ''
+
+check-can-GET-restXQ-route:
+	@printf %60s | tr ' ' '-' && echo ''
+	@#docker cp fixtures $(XQN):/tmp
+	@# $(EVAL) 'xqerl:compile("/tmp/fixtures/rest.xq")'
+	@w3m -dump $(Address)
+	@printf %60s | tr ' ' '-' && echo ''
+	@w3m -dump $(Address)/route/detail?id=a
+	@printf %60s | tr ' ' '-' && echo ''
+	@printf %60s | tr ' ' '-' && echo ''
 
 .PHONY: up
 up:
