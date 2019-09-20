@@ -25,7 +25,7 @@ jobs:
           'xqerl:run("xs:token(\"cats\"), xs:string(\"dogs\"), true() ").'
           printf %60s | tr ' ' '-' && echo ''
           echo '  - copy xQuery files into container ' \
-          && docker exec xq mkdir -p /tmp/fixtures
+          && docker exec xq mkdir -p /tmp/fixtures \
           && docker cp ./fixtures xq:/tmp/fixtures
           printf %60s | tr ' ' '-' && echo ''
           echo '  - list copied container files' \
