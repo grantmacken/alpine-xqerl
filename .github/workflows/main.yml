@@ -32,5 +32,5 @@ jobs:
     - name: Take down docker container
       run: make down
     - name: Docker Login
-      run: echo ${{ secrets.D }}
+      run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
         
