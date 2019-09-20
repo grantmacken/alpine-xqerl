@@ -73,6 +73,30 @@ check:
 	$(EVAL) 'S = xqerl:compile("/tmp/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
 	@printf %60s | tr ' ' '-' && echo ''
 
+# printf %60s | tr ' ' '-' && echo ''
+#
+#      echo    ' - compile and run example xQuery' \
+#      && echo '   should return some text ' \
+#      && docker exec xq ./bin/xqerl eval \
+#      'xqerl:compile("/tmp/example.xq")'
+#      printf %60s | tr ' ' '-' && echo ''
+# echo '  - copy xQuery file into container ' \
+# && docker cp fixtures/sudoku2.xq xq:/tmp
+# printf %60s | tr ' ' '-' && echo ''
+# echo '  - list copied container file' \
+# docker exec xq ls /tmp
+# printf %60s | tr ' ' '-' && echo ''
+# echo    ' - compile an xQuery file' \
+# && echo '   should return name of compiled file' \
+# && docker exec xq ./bin/xqerl eval \
+# 'xqerl:compile("/tmp/sudoku2.xq")'
+# printf %60s | tr ' ' '-' && echo ''
+# echo    ' - compile and run xQuery' \
+# && echo '   should return query result as XML ' \
+# && docker exec xq ./bin/xqerl eval \
+# 'S = xqerl:compile("/tmp/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
+# printf %60s | tr ' ' '-' && echo ''
+
 xxxxx:
 	@echo ' - copy XML file into container '
 	@docker -v cp fixtures/functx_order.xml $(XQN):/tmp
