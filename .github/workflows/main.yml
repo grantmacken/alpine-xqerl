@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
     - name: Print GitHub Context # Debug step
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
