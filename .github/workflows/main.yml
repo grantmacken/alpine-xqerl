@@ -40,7 +40,7 @@ jobs:
       id: fetch
       uses: grantmacken/actions-container-template@master
       with: 
-        URL: 'https:example.com'
+        URL: 'https://example.com'
 
 
   
