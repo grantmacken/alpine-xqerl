@@ -30,9 +30,21 @@ jobs:
           make check-can-use-node-to-xml
           make check-can-set-restXQ-routes
           make check-can-GET-restXQ-route
-
     - name: Take down docker container
       run: make down
+  w3m_job:
+    runs-on: ubuntu-latest
+    name: A job to fetch urls
+    steps:
+    - name: test action
+      id: fetch
+      uses: grantmacken@actions-container-template
+      with: 
+        URL: 'https:example.com'
+
+
+  
+
     # - name: Docker Login In and Push to dockerhub 
     #   run:  echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin 
     # - name: make push

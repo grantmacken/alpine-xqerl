@@ -2,9 +2,9 @@
 
 Pre-build images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl)
 
-Test build ![](https://github.com/grantmacken/alpine-xqerl/workflows/CI/badge.svg)
+![](https://github.com/grantmacken/alpine-xqerl/workflows/CI/badge.svg)
 
-<!-- Test build on [travis-ci](https://travis-ci.org/grantmacken/alpine-xqerl) -->
+Test build on [travis-ci](https://travis-ci.org/grantmacken/alpine-xqerl)
 
 [![Build Status](https://travis-ci.org/grantmacken/alpine-eXist.svg?branch=master)](https://travis-ci.org/grantmacken/alpine-xqerl)
 
