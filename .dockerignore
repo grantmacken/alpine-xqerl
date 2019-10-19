@@ -1,0 +1,6 @@
+# ingnore
+.git
+.github
+*.md
+docs
+test
