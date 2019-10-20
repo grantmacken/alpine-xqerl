@@ -50,16 +50,28 @@ info:
 	@docker exec $(XQN) ls /tmp
 	@printf %60s | tr ' ' '-' && echo
 
+.PHONY: check-can-compile-sudoku2
+check-can-compile-sudoku2:
+	@echo '## $@ ##'
+	@echo ' - compile an xQuery file'
+	@echo '   should return name of compiled file'
+	$(EVAL) 'xqerl:compile("./fixtures/queries/sudoku2.xq")'
+	@printf %60s | tr ' ' '-' && echo ''
+	@#echo ' - compile, run then grep the title'
+	@#xqerl eval 'S = xqerl:compile("./fixtures/queries/sudoku2.xq"),xqerl_node:to_xml(S:main(#{})).'
+	@#printf %60s | tr ' ' '-' && echo
+	@printf %60s | tr ' ' '-' && echo ''
+
 .PHONY: check-can-compile
 check-can-compile:
 	@echo '## $@ ##'
 	@echo ' - compile an xQuery file'
 	@echo '   should return name of compiled file'
-	$(EVAL) 'xqerl:compile("./fixtures/example.xq")'
+	$(EVAL) 'xqerl:compile("./fixtures/queries/example.xq")'
 	@printf %60s | tr ' ' '-' && echo 
 	@echo ' - compile an xQuery file then run query'
 	@echo '   should return query result'
-	$(EVAL) 'io:format(xqerl:run(xqerl:compile("./fixtures/example.xq")))'
+	$(EVAL) 'io:format(xqerl:run(xqerl:compile("./fixtures/queries/example.xq")))'
 	@printf %60s | tr ' ' '-' && echo ''
 
 .PHONY: check-can-use-external
@@ -67,21 +79,27 @@ check-can-use-external:
 	@echo '## $@ ##'
 	@echo ' - compile an xQuery file then run query'
 	@echo '   passing an external arg "hey hey" to the compiled xQuery'
-	$(EVAL) 'J = xqerl:compile("./fixtures/example2.xq"),C = #{<<"msg">> => <<"hey hey">>},io:format(J:main(C)).'
+	@$(EVAL) 'J = xqerl:compile("./fixtures/queries/example2.xq"),C = #{<<"msg">> => <<"hey hey">>},io:format(J:main(C)).' \
+ | grep -oP '(.+)(?=ok)'
 	@printf %60s | tr ' ' '-' && echo ''
 
 .phony: db-can-insert
 db-can-insert:
 	@echo '## $@ ##'
 	@echo -n ' - check insert doc into db: '
-	@$(EVAL) 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","./fixtures/small.xml").'
+	@$(EVAL) \
+ 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","./fixtures/data/xml/functx_order.xml").' 
 	@printf %60s | tr ' ' '-' && echo ''
 
 .phony: db-can-get
 db-can-get:
 	@echo '## $@ ##'
-	@echo ' - retrieve stored document from database'
-	@$(EVAL) 'io:format(xqerl_node:to_xml(xqerl:run("doc(\"http://xqerl.org/my_doc.xml\")"))).'
+	@echo -n ' - retrieve stored document from database: '
+	@$(EVAL) \
+ 'io:format(xqerl_node:to_xml(xqerl:run("doc(\"http://xqerl.org/my_doc.xml\")"))).' \
+ | grep -oP 'ok$$'
+	@$(EVAL) \
+ 'io:format(xqerl_node:to_xml(xqerl:run("doc(\"http://xqerl.org/my_doc.xml\")"))).' 
 	@printf %60s | tr ' ' '-' && echo ''
 
 .PHONY: db-can-delete
