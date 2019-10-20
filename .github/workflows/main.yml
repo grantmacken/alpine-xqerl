@@ -61,7 +61,7 @@ jobs:
             make routes
             make route-landing
             make route-params
-            make route--alt-params
+            make route-alt-params
       - 
         name: Take Down Docker Container
         run: make down
