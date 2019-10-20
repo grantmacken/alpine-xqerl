@@ -1,25 +1,28 @@
 version: '3.7'
 services:
   xqerl:
-    image: ${DOCKER_IMAGE}:v${DOCKER_TAG}
+    image: ${DOCKER_IMAGE}:min
     container_name: ${XQERL_CONTAINER_NAME}
     ports:
-        - ${XQERL_PORT}:${XQERL_PORT}
-    volumes:
-        - type: volume
-          source: db
-          target: ${XQERL_HOME}/${DATA_DIR}
-        - type: volume
-          source: code
-          target: ${XQERL_HOME}/${CODE_DIR}
+      - ${XQERL_PORT}:${XQERL_PORT}
+    volumes:     
+      - type: bind
+        source: ./fixtures
+        target: ${XQERL_HOME}/fixtures
+    #     - type: volume
+    #       source: db
+    #       target: ${XQERL_HOME}/${DATA_DIR}
+    #     - type: volume
+    #       source: code
+    #       target: ${XQERL_HOME}/${CODE_DIR}
 
-volumes:
-  db:
-    driver: local
-    name: ${DATA_DIR}
-  code:
-    driver: local
-    name: ${CODE_DIR}
+# volumes:
+  # db:
+    # driver: local
+    # name: ${DATA_DIR}
+  # code:
+    # driver: local
+    # name: ${CODE_DIR}
 
 networks:
   default:
