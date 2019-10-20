@@ -1,46 +1,72 @@
 name: CI
 
-on: [push]
+on: 
+  push:
+    branches: master
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-      with:
-        fetch-depth: 1
-    - name: Print GitHub Context # Debug step
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
-    - name: Build Docker Image From xqerl repo
-      run: make build
-    - name: Bring up xq container
-      run: |
+      - 
+        name: Checkout Repo
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - 
+        name: Print GitHub Context
+        run: echo ${{ toJson(github) }}
+      -
+        name: Set up Docker Buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          version: latest
+      - 
+        name: Available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+      - 
+        name: Run Buildx
+        run: |
+            docker buildx build \
+            --target "min"
+            --output "type=docker" \
+            --tag "grantmacken/alpine-xqerl:min" \
+      - 
+        name: Build Docker Image From xqerl repo
+        run: make build
+      - 
+        name: Bring up xq container
+        run: |
           make network
           make up
           sleep 5
           make info
-    - name: Some Can Do Tests
-      run: |
-          make check-can-run-expression
-          make check-copy-into-container
+          make inspect
+      - 
+        name: Some Can Do Checks
+        run: |
+          # make check-can-run-expression
+          # make check-copy-into-container
           make check-can-compile
           make check-can-use-external
-          make check-can-use-node-to-xml
-          make check-can-set-restXQ-routes
-          make check-can-GET-restXQ-route
-    - name: Take down docker container
-      run: make down
-  w3m_job:
-    runs-on: ubuntu-latest
-    name: A job to fetch urls
-    steps:
-    - name: test action
-      id: fetch
-      uses: grantmacken/actions-container-template@master
-      with: 
-        URL: 'https://example.com'
+      - 
+        name: Some Can Use DB Checks
+        run: |
+            make db-can-insert
+            make db-can-get
+            make db-can-delete
+      - 
+        name: Some Can Use restXQ Checks
+        run: |
+            make routes
+            make route-landing
+            make route-params
+            make route--alt-params
+      - 
+        name: Take Down Docker Container
+        run: make down
 
 
   
