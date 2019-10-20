@@ -4,16 +4,21 @@ Pre-build images are available on [dockerhub](https://hub.docker.com/r/grantmack
 
 ![](https://github.com/grantmacken/alpine-xqerl/workflows/CI/badge.svg)
 
-Test build on [travis-ci](https://travis-ci.org/grantmacken/alpine-xqerl)
-
+<!--
 [![Build Status](https://travis-ci.org/grantmacken/alpine-eXist.svg?branch=master)](https://travis-ci.org/grantmacken/alpine-xqerl)
+-->
 
  [xqerl](https://zadean.github.io/xqerl)
  maintained by 
  [Zachary Dean](https://github.com/zadean),
  is an Erlang XQuery 3.1 Processor and XML Database.
 
-## Deploy Image
+#Intro
+
+TODO!
+
+
+## Smallish Deploy Image
 
 ```
 docker pull grantmacken/alpine-xqerl:latest
