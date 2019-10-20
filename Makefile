@@ -53,12 +53,6 @@ clean:
 	@#docker container prune
 	@docker rmi $$(docker images -a | grep "xqerl" | awk '{print $$3}')
 
-.PHONY: travis
-travis: 
-	@travis env set DOCKER_USERNAME $(shell git config --get user.name)
-	@#travis env set DOCKER_PASSWORD
-	@travis env list
-
 .PHONY: network 
 network: 
 	@docker network create $(NETWORK)
