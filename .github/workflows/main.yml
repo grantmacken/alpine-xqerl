@@ -27,9 +27,10 @@ jobs:
         name: Run Buildx
         run: |
             docker buildx build \
-            --target "min"
+            --target "min" \
             --output "type=docker" \
             --tag "grantmacken/alpine-xqerl:min" \
+            .
       - 
         name: Build Docker Image From xqerl repo
         run: make build
