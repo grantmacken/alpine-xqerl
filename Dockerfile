@@ -28,16 +28,18 @@ RUN --mount=type=cache,target=/home/.cache/rebar3 \
 ENTRYPOINT ["rebar3", "shell"]
 
 # NOTE: could do a dev release stage
+# FROM shell as rel
+# RUN --mount=type=cache,target=/var/cache/apk \ 
+#     --mount=type=cache,target=/home/.cache/rebar3 \
+#     apk add --update git \
+#     && cd /home/xqerl \
+#     && rebar3 as prod tar \
+#     && rebar3 release \
+#     && ln -s ${REBAR_BASE_DIR}/default/rel/xqerl/bin/xqerl /usr/local/bin/xqerl
 
-FROM shell as rel
-RUN --mount=type=cache,target=/var/cache/apk \ 
-    --mount=type=cache,target=/home/.cache/rebar3 \
-    apk add --update git \
-    && cd /home/xqerl \
-    && rebar3 as prod tar \
-    && rebar3 release
+# ENTRYPOINT ["xqerl","console" ]
 
-FROM rel as prod
+FROM shell as prod
 
 RUN --mount=type=cache,target=/var/cache/apk \ 
     --mount=type=cache,target=/home/.cache/rebar3 \

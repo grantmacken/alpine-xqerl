@@ -5,7 +5,7 @@ run-shell:
   -it --rm \
   --name shell \
   --network www \
-  --publish 8081:8081 \
+  --publish 8082:8081 \
   --log-driver=$(XQERL_LOG_DRIVER) \
   --mount "type=bind,source=$(CURDIR)/fixtures,target=/home/xqerl/fixtures" \
   --detach \
@@ -19,17 +19,17 @@ run-shell:
 	@docker ps --format '{{.Ports}}' | grep -oP '^(.+):\K(\d{4})'
 	@docker attach shell
 
-.PHONY: run-min
-run-min:
+.PHONY: run-dev
+run-dev:
+	@mkdir -p src
 	@docker run \
-  --name $(XQN) \
+  --name xqDev \
   --hostname gmack.nz \
   --network www \
-  --publish 8082:8081 \
+  --publish 8083:8081 \
   --log-driver=$(XQERL_LOG_DRIVER) \
-  --mount "type=bind,source=$(CURDIR)/fixtures,target=/tmp" \
-  --rm -d \
-  grantmacken/alpine-xqerl:min foreground
+  -it --rm \
+  grantmacken/alpine-xqerl:rel
 
 .PHONY: attach-shell
 attach-shell:

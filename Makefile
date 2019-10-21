@@ -31,6 +31,7 @@ build:
  docker buildx build -o type=docker \
   --target="$(if $(TARGET),$(TARGET),min)" \
   --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),v$(DOCKER_TAG))" \
+  --tag="$(DOCKER_IMAGE):latest" \
  .
 	@echo
 

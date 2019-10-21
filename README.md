@@ -1,8 +1,8 @@
 # [alpine-xqerl](https://github.com/grantmacken/alpine-xqerl)
 
-Pre-build images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl)
+Pre-built images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl)
 
-![](https://github.com/grantmacken/alpine-xqerl/workflows/CI/badge.svg)
+[![](https://github.com/grantmacken/alpine-xqerl/workflows/CI/badge.svg)](https://github.com/grantmacken/alpine-xqerl/actions)
 
 <!--
 [![Build Status](https://travis-ci.org/grantmacken/alpine-eXist.svg?branch=master)](https://travis-ci.org/grantmacken/alpine-xqerl)
@@ -17,6 +17,13 @@ Pre-build images are available on [dockerhub](https://hub.docker.com/r/grantmack
 
 TODO!
 
+
+
+
+## Available Alpine Images 
+
+1. shell: a clone of xqerl repo with the entry point via `rebar3 shell` 
+2. production release: a smallish production ready deploy image
 
 ## Smallish Deploy Image
 

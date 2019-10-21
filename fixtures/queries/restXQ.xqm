@@ -42,6 +42,15 @@ function route:params($h, $content) {
 map { "type": $h, "content": $content}
 };
 
+declare 
+  %rest:HEAD
+  %rest:path('/params')
+  %rest:produces('application/json')
+  %output:method('json')
+function route:params() {
+map { "type": "type", "content": "content"}
+};
+
 (:
 curl -v \
  --data "h=entry" \

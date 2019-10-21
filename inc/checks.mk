@@ -128,16 +128,27 @@ route-landing:
 	@curl -v $(Address)/landing
 	@echo; printf %60s | tr ' ' '-' && echo ''
 
+
+.PHONY: route-head-params
+route-head-params:
+	@echo '## $@ ##'
+	@curl --head "$(Address)/params"
+	@printf %60s | tr ' ' '-' && echo ''
+
 .PHONY: route-params
 route-params:
 	@echo '## $@ ##'
-	@curl -v "$(Address)/params?h=entry&content=Burn+Out" | jq '.'
+	@curl -s "$(Address)/params?h=entry&content=Burn+Out" | jq '.'
 	@printf %60s | tr ' ' '-' && echo ''
 
 .PHONY: route-alt-params
 route-alt-params:
 	@echo '## $@ ##'
-	@curl -v -G \
+	@curl -I -G \
+ --data "h=entry" \
+ --data-urlencode "content=Insomniac Rust" \
+ "$(Address)/params"
+	@curl -s -G \
  --data "h=entry" \
  --data-urlencode "content=Insomniac Rust" \
  "$(Address)/params" | jq '.'
