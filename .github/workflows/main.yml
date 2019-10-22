@@ -1,75 +1,64 @@
 name: CI
 
-on: 
+on:
   push:
     branches: master
-
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - 
-        name: Checkout Repo
+      - name: Checkout Repo
         uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         id: buildx
         uses: crazy-max/ghaction-docker-buildx@v1
         with:
           version: latest
-      - 
-        name: Run Buildx
+      - name: Run Buildx
         run: |
-            docker buildx build \
-            --target "min" \
-            --output "type=docker" \
-            --tag "grantmacken/alpine-xqerl:min" \
-            --tag "grantmacken/alpine-xqerl:latest" \
-            --tag "grantmacken/alpine-xqerl:latest" \
-            .
-      - 
-        name: Build Docker Image From xqerl repo
+          docker buildx build \
+          --target "min" \
+          --output "type=docker" \
+          --tag "grantmacken/alpine-xqerl:min" \
+          --tag "grantmacken/alpine-xqerl:latest" \
+          --tag "grantmacken/alpine-xqerl:latest" \
+          .
+      - name: Build Docker Image From xqerl repo
         run: make build
-      - 
-        name: Bring up xq container
+      - name: Bring up xq container
         run: |
           make network
           make up
           sleep 5
           make info
           make inspect
-      - 
-        name: Some Can Do Checks
+      - name: Some Can Do Checks
         run: |
           # make check-can-run-expression
           # make check-copy-into-container
           make check-can-compile
           make check-can-use-external
-      - 
-        name: Some Can Use DB Checks
+      - name: Some Can Use DB Checks
         run: |
-            make db-can-insert
-            make db-can-get
-            make db-can-delete
-      - 
-        name: Some Can Use restXQ Checks
+          make db-can-insert
+          make db-can-get
+          make db-can-delete
+      - name: Some Can Use restXQ Checks
         run: |
-            make routes
-            make route-landing
-            make route-params
-            make route-alt-params
-      - 
-        name: Take Down Docker Container
+          make routes
+          make route-landing
+          make route-params
+          make route-alt-params
+      - name: Take Down Docker Container
         run: make down
-     - 
-        name: Docker Login In and Push to dockerhub 
+      - name: Docker Login In and Push to dockerhub
         run: |
           pwd
           ls -al .
           source .env
           echo "${DOCKER_TAG}"
-            #echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin 
-            #make push
+          #echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin 
+          #make push
