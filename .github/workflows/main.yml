@@ -69,6 +69,7 @@ jobs:
           make route-post-xml-file
           printf %60s | tr ' ' '=' && echo
       - name: Create, Update Delete, DB resources via restXQ
+        run: |
           make route-create
           make route-toast
           make route-get-created-resource
