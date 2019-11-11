@@ -51,7 +51,7 @@ jobs:
         run: |
           make db-can-insert
           make db-can-get
-          make db-can-delete
+          #make db-can-delete
       - name: restXQ Checks
         run: |
           make routes
@@ -84,6 +84,7 @@ jobs:
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin 
           make push
           make push TARGET=$(date --iso)-min
+          make push TARGET=${REPO_SHA}
           make push TARGET=latest
           make push TARGET=$(date --iso)-shell
           make push TARGET=shell
