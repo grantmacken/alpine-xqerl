@@ -44,8 +44,6 @@ build:
 sha:
 	@sed -i 's/REPO_SHA.*/REPO_SHA=$(SHA)/' .env
 
-
-
 .PHONY: up
 up:
 	@docker-compose up -d
@@ -58,7 +56,7 @@ down:
 .PHONY: push
 push:
 	@echo '## $@ ##'
-	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),v$(DOCKER_TAG))
+	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(SHA))
 
 .PHONY: clean
 clean:

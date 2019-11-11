@@ -91,9 +91,6 @@ db-can-insert:
  'xqldb_dml:insert_doc("http://xqerl.org/archive/my_doc.xml","./fixtures/data/xml/functx_order.xml").' 
 	@printf %60s | tr ' ' '-' && echo ''
 
-
-
-
 .phony: db-can-get
 db-can-get:
 	@echo '## $@ ##'
