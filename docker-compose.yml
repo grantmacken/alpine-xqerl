@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   xqerl:
-    image: ${DOCKER_IMAGE}:min
+    image: ${DOCKER_IMAGE}:${REPO_SHA}
     container_name: ${XQERL_CONTAINER_NAME}
     ports:
       - ${XQERL_PORT}:${XQERL_PORT}
