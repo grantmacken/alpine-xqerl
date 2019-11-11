@@ -3,7 +3,6 @@ name: CI
 on:
   push:
     branches: master
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,7 +30,7 @@ jobs:
           --output "type=docker" \
           --tag "${DOCKER_IMAGE}:$(date --iso)-min" \
           --tag "${DOCKER_IMAGE}:latest" \
-          --tag "${DOCKER_IMAGE}:${DOCKER_TAG}" \
+          --tag "${DOCKER_IMAGE}:${REPO_SHA}" \
           .
       - name: Build Docker Image From xqerl repo
         run: make build
@@ -48,17 +47,32 @@ jobs:
           # make check-copy-into-container
           make check-can-compile
           make check-can-use-external
-      - name: Some Can Use DB Checks
+      - name: DB Checks
         run: |
           make db-can-insert
           make db-can-get
           make db-can-delete
-      - name: Some Can Use restXQ Checks
+      - name: restXQ Checks
         run: |
           make routes
-          make route-landing
-          make route-params
-          make route-alt-params
+          make route-head
+          make route-head-redirect
+          make route-get-xml
+          make route-get-csv
+          make route-get-json
+          make route-get-html
+          printf %60s | tr ' ' '=' && echo
+          echo 'Accepting HTML form posted data'
+          make route-post-form
+          make route-form-multi
+          echo 'Accepting posted data'
+          make route-post-xml-file
+          printf %60s | tr ' ' '=' && echo
+      - name: Create, Update Delete, DB resources via restXQ
+          make route-create
+          make route-toast
+          make route-get-created-resource
+          make route-delete-toast
       - name: Take Down Docker Container
         run: make down
       - name: Docker Login In and Push to dockerhub

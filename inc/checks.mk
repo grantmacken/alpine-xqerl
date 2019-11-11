@@ -88,18 +88,21 @@ db-can-insert:
 	@echo '## $@ ##'
 	@echo -n ' - check insert doc into db: '
 	@$(EVAL) \
- 'xqldb_dml:insert_doc("http://xqerl.org/my_doc.xml","./fixtures/data/xml/functx_order.xml").' 
+ 'xqldb_dml:insert_doc("http://xqerl.org/archive/my_doc.xml","./fixtures/data/xml/functx_order.xml").' 
 	@printf %60s | tr ' ' '-' && echo ''
+
+
+
 
 .phony: db-can-get
 db-can-get:
 	@echo '## $@ ##'
 	@echo -n ' - retrieve stored document from database: '
 	@$(EVAL) \
- 'io:format(xqerl_node:to_xml(xqerl:run("doc(\"http://xqerl.org/my_doc.xml\")"))).' \
+ 'io:format(xqerl_node:to_xml(xqerl:run("doc(\"http://xqerl.org/archive/my_doc.xml\")"))).' \
  | grep -oP 'ok$$'
 	@$(EVAL) \
- 'io:format(xqerl_node:to_xml(xqerl:run("doc(\"http://xqerl.org/my_doc.xml\")"))).' 
+ 'io:format(xqerl_node:to_xml(xqerl:run("doc(\"http://xqerl.org/archive/my_doc.xml\")"))).' 
 	@printf %60s | tr ' ' '-' && echo ''
 
 .PHONY: db-can-delete
@@ -113,21 +116,66 @@ db-can-delete:
 	$(EVAL) 'xqerl:run("doc(\"http://xqerl.org/my_doc.xml\")").'
 	@printf %60s | tr ' ' '=' && echo ''
 
-.PHONY: routes
+.phony: db-can-list-stored-items-in-collection
+db-can-list-stored-items-in-collection:
+	@echo '## $@ ##'
+	@echo ' - use `fn:uri-collection()` to list items'
+	@$(EVAL) \
+ 'xqerl:run("fn:uri-collection(\"http://xqerl.org/archive\")").' | \
+ grep -oP '\{xqAtomicValue.+$$'
+	@printf %60s | tr ' ' '-' && echo ''
+
+.PHONY: routes 
 routes:
 	@echo '## $@ ##'
 	@echo ' -  compile restXQ functions to run on the beam'
-	@$(EVAL) 'xqerl:compile("./fixtures/queries/restXQ.xqm")'
+	@$(EVAL) 'xqerl:compile("./fixtures/queries/tests-restXQ.xqm")'
 	@printf %60s | tr ' ' '-' && echo ''
 
-.PHONY: route-landing
-route-landing:
-	@echo '## $@ ##'
-	@echo ' restXQ exposes http URL endpoint'
-	@echo ' - curl: GET landing page'
-	@curl -v $(Address)/landing
-	@echo; printf %60s | tr ' ' '-' && echo ''
 
+ADDRESS = http://localhost:8081
+
+.PHONY: route-get-xml
+route-get-xml:
+	@echo '## $@ ##'
+	@curl -s $(ADDRESS)/test/get/xml | \
+ grep -oP '<root>(.+)</root>'
+	@printf %60s | tr ' ' '-' && echo ''
+
+.PHONY: route-get-csv
+route-get-csv:
+	@printf %60s | tr ' ' '=' && echo
+	@echo '## $@ ##'
+	@curl -s $(ADDRESS)/test/get/csv 
+	@printf %60s | tr ' ' '-' && echo ''
+
+.PHONY: route-get-html
+route-get-html:
+	@printf %60s | tr ' ' '=' && echo
+	@echo '## $@ ##'
+	@curl -s $(ADDRESS)/test/get/html 
+	@echo;printf %60s | tr ' ' '-' && echo ''
+
+.PHONY: route-get-json
+route-get-json:
+	@printf %60s | tr ' ' '=' && echo
+	@echo '## $@ ##'
+	@curl -s $(ADDRESS)/test/get/json | jq -M '.'
+	@echo;printf %60s | tr ' ' '-' && echo ''
+
+.PHONY: route-head
+route-head:
+	@printf %60s | tr ' ' '=' && echo
+	@echo '## $@ ##'
+	@curl -v --head "$(ADDRESS)/test/head/xml"
+	@echo;printf %60s | tr ' ' '-' && echo ''
+
+.PHONY: route-head-redirect
+route-head-redirect:
+	@echo '## $@ ##'
+	@curl -v --head "$(ADDRESS)/test/head/redirect" |\
+ grep  'location'
+	@printf %60s | tr ' ' '-' && echo ''
 
 .PHONY: route-head-params
 route-head-params:
@@ -135,21 +183,77 @@ route-head-params:
 	@curl --head "$(Address)/params"
 	@printf %60s | tr ' ' '-' && echo ''
 
-.PHONY: route-params
-route-params:
+.PHONY: route-post-form
+route-post-form:
 	@echo '## $@ ##'
-	@curl -s "$(Address)/params?h=entry&content=Burn+Out" | jq '.'
+	@curl -v \
+ --data-urlencode "message=Insomniac Rust" \
+ --data-urlencode "message2=Never Sleeps" \
+ "$(ADDRESS)/test/post/form"
+	@echo;printf %60s | tr ' ' '-' && echo ''
+
+define t_md
+# hi de hi
+
+happy campers of the world unite
+endef
+
+route-form-multi: export t_md:=$(t_md)
+route-form-multi:
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo '## $@ ##'
+	@echo "$${t_md}"
+	@echo "$${t_md}" > ./test.md
+	@printf %60s | tr ' ' '-' && echo ''
+	@curl -v \
+  --form files=@./test.md \
+  $(ADDRESS)/test/post/form_multi
+	@rm ./test.md
+	@echo;printf %60s | tr ' ' '-' && echo ''
+
+define t_xml
+<root>
+  <a>text</a>
+</root>
+endef
+
+route-post-xml-file: export t_xml:=$(t_xml)
+route-post-xml-file:
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo '## $@ ##'
+	@echo "$${t_xml}" | curl -s \
+ -H 'Content-Type: application/xml' \
+  --data-binary @- $(ADDRESS)/test/post/xml
+
+.PHONY: route-post-xml-string
+route-post-xml-string:
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo '## $@ ##'
+	@curl -s \
+ -H "Content-Type: application/xml" \
+ -d '<root>branch</root>' \
+ "$(ADDRESS)/test/post/xml"
+	@@echo;printf %60s | tr ' ' '-' && echo ''
+
+route-create: export t_xml:=$(t_xml)
+route-create:
+	@echo '## $@ ##'
+	@echo "$${t_xml}" | curl -v \
+ -H 'Content-Type: application/xml' \
+  --data-binary @- \
+  $(ADDRESS)/test/post/get?id=toast
 	@printf %60s | tr ' ' '-' && echo ''
 
-.PHONY: route-alt-params
-route-alt-params:
-	@echo '## $@ ##'
-	@curl -I -G \
- --data "h=entry" \
- --data-urlencode "content=Insomniac Rust" \
- "$(Address)/params"
-	@curl -s -G \
- --data "h=entry" \
- --data-urlencode "content=Insomniac Rust" \
- "$(Address)/params" | jq '.'
+.PHONY: route-get-created-resource
+route-get-created-resource:
 	@printf %60s | tr ' ' '-' && echo ''
+	@echo '## $@ ##'
+	@curl -s \
+  $(ADDRESS)/test/post/get/doc/toast
+
+.PHONY: route-delete-toast
+route-delete-toast:
+	@printf %60s | tr ' ' '-' && echo ''
+	@echo '## $@ ##'
+	@curl -v -X DELETE \
+  $(ADDRESS)/test/post/get/doc/toast
