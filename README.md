@@ -2,11 +2,19 @@
 
 Pre-built images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl)
 
-[![](https://github.com/grantmacken/alpine-xqerl/workflows/CI/badge.svg)](https://github.com/grantmacken/alpine-xqerl/actions)
+```
+docker pull grantmacken/alpine-xqerl
+```
+
+xqerl is in constant development, so I have also tagged images with the [master](https://github.com/zadean/xqerl)
+commit sha, which are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl/tags)
 
 <!--
-[![Build Status](https://travis-ci.org/grantmacken/alpine-eXist.svg?branch=master)](https://travis-ci.org/grantmacken/alpine-xqerl)
+https://github.com/zadean/xqerl/commit/64558530421e1bc53451754361282ac1dbea8b4f 
 -->
+
+
+[![](https://github.com/grantmacken/alpine-xqerl/workflows/CI/badge.svg)](https://github.com/grantmacken/alpine-xqerl/actions)
 
  [xqerl](https://zadean.github.io/xqerl)
  maintained by 

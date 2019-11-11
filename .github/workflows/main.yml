@@ -83,8 +83,5 @@ jobs:
           echo "${DOCKER_TAG}"
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin 
           make push
-          make push TARGET=$(date --iso)-min
-          make push TARGET=${REPO_SHA}
           make push TARGET=latest
-          make push TARGET=$(date --iso)-shell
           make push TARGET=shell
