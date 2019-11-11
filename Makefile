@@ -6,7 +6,6 @@ include inc/run.mk
 XQN=$(XQERL_CONTAINER_NAME)
 EVAL=docker exec $(XQN) xqerl eval
 
-
 Address = http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) ):8081
 
 define mkHelp
@@ -18,6 +17,10 @@ make build
 make build TARGET=shell
 
 -------------------------------------------------------------------------------
+Note:
+tag now from zadean git heads/master ref sha
+
+
 endef
 
 
@@ -25,15 +28,23 @@ help: export HELP=$(mkHelp)
 help:
 	@echo "$${HELP}"
 
+SHA != curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/master | jq -Mr '.object.sha'
+
 .PHONY: build
 build:
 	@export DOCKER_BUILDKIT=1;\
- docker buildx build -o type=docker \
+  docker buildx build -o type=docker \
   --target="$(if $(TARGET),$(TARGET),min)" \
-  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),v$(DOCKER_TAG))" \
+  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(SHA))" \
   --tag="$(DOCKER_IMAGE):latest" \
  .
 	@echo
+
+.PHONY: sha
+sha:
+	@sed -i 's/REPO_SHA.*/REPO_SHA=$(SHA)/' .env
+
+
 
 .PHONY: up
 up:
@@ -42,6 +53,7 @@ up:
 .PHONY: down
 down:
 	@docker-compose down
+
 
 .PHONY: push
 push:
@@ -57,4 +69,5 @@ clean:
 .PHONY: network 
 network: 
 	@docker network create $(NETWORK)
+
 
