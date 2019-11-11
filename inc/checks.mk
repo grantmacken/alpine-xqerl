@@ -219,11 +219,11 @@ endef
 
 route-post-xml-file: export t_xml:=$(t_xml)
 route-post-xml-file:
-	@printf %60s | tr ' ' '-' && echo ''
 	@echo '## $@ ##'
 	@echo "$${t_xml}" | curl -s \
  -H 'Content-Type: application/xml' \
   --data-binary @- $(ADDRESS)/test/post/xml
+	@printf %60s | tr ' ' '-' && echo ''
 
 .PHONY: route-post-xml-string
 route-post-xml-string:
@@ -246,14 +246,15 @@ route-create:
 
 .PHONY: route-get-created-resource
 route-get-created-resource:
-	@printf %60s | tr ' ' '-' && echo ''
 	@echo '## $@ ##'
 	@curl -s \
   $(ADDRESS)/test/post/get/doc/toast
+	@printf %60s | tr ' ' '-' && echo ''
 
-.PHONY: route-delete-toast
-route-delete-toast:
+.PHONY: route-delete-resource
+route-delete-resource:
 	@printf %60s | tr ' ' '-' && echo ''
 	@echo '## $@ ##'
 	@curl -v -X DELETE \
   $(ADDRESS)/test/post/get/doc/toast
+	@printf %60s | tr ' ' '-' && echo ''

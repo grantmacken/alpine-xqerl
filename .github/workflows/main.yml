@@ -71,9 +71,8 @@ jobs:
       - name: Create, Update Delete, DB resources via restXQ
         run: |
           make route-create
-          make route-toast
           make route-get-created-resource
-          make route-delete-toast
+          make route-delete-resource
       - name: Take Down Docker Container
         run: make down
       - name: Docker Login In and Push to dockerhub
