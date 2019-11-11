@@ -174,10 +174,11 @@ route-head-redirect:
  grep  'location'
 	@printf %60s | tr ' ' '-' && echo ''
 
-.PHONY: route-head-params
-route-head-params:
+
+.PHONY: route-options
+route-options:
 	@echo '## $@ ##'
-	@curl --head "$(Address)/params"
+	@curl -v -X OPTIONS "$(ADDRESS)/test/options/xml"
 	@printf %60s | tr ' ' '-' && echo ''
 
 .PHONY: route-post-form

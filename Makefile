@@ -20,29 +20,31 @@ make build TARGET=shell
 Note:
 tag now from zadean git heads/master ref sha
 
-
 endef
-
 
 help: export HELP=$(mkHelp)
 help:
 	@echo "$${HELP}"
 
-SHA != curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/master | jq -Mr '.object.sha'
+HEAD_SHA != curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/master | jq -Mr '.object.sha'
+THIS_SHA != grep -oP 'REPO_SHA=\K(.+)' .env
 
 .PHONY: build
-build:
-	@export DOCKER_BUILDKIT=1;\
+build: sha
+	@export DOCKER_BUILDKIT=1;
+	LATEST=$(THIS_SHA);\
   docker buildx build -o type=docker \
   --target="$(if $(TARGET),$(TARGET),min)" \
-  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(SHA))" \
+  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(THIS_SHA))" \
   --tag="$(DOCKER_IMAGE):latest" \
  .
 	@echo
 
 .PHONY: sha
 sha:
-	@sed -i 's/REPO_SHA.*/REPO_SHA=$(SHA)/' .env
+	@echo "previous commit sha: $(THIS_SHA)"
+	@LATEST=$(HEAD_SHA);echo "  latest commit sha: $$LATEST";\
+  if [ ! "$$LATEST" = "$(THIS_SHA)" ]; then sed -i 's/REPO_SHA.*/REPO_SHA=$(HEAD_SHA)/' .env ; fi
 
 .PHONY: up
 up:
@@ -52,11 +54,10 @@ up:
 down:
 	@docker-compose down
 
-
 .PHONY: push
 push:
 	@echo '## $@ ##'
-	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(SHA))
+	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(REPO_SHA))
 
 .PHONY: clean
 clean:
