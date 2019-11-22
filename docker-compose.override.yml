@@ -1,0 +1,8 @@
+version: '3.7'
+services:
+  xqerl:
+    volumes:     
+      - type: bind
+        source: ./fixtures
+        target: ${XQERL_HOME}/fixtures
+
