@@ -53,9 +53,14 @@ COPY --from=prod /usr/local/xqerl /usr/local/xqerl
 RUN  --mount=type=cache,target=/var/cache/apk \
       ln -vs /var/cache/apk /etc/apk/cache \
       && apk add --update openssl ncurses \
-      && ln -s /usr/local/xqerl/bin/xqerl /usr/local/bin/xqerl
+      && ln -s /usr/local/xqerl/bin/xqerl /usr/local/bin/xqerl \
+      && mkdir /usr/local/xqerl/bin/scripts \
+      && mkdir /usr/local/xqerl/code/src 
+
 
 ENV XQERL_HOME /usr/local/xqerl
+ENV XQERL_NAME xqerl@127.0.0.1
+ENV XQERL_COOKIE monster
 ENV HOME=/home
 WORKDIR ${XQERL_HOME}
 EXPOSE 8081

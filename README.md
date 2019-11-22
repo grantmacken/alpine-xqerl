@@ -6,11 +6,8 @@ Pre-built images are available on [dockerhub](https://hub.docker.com/r/grantmack
 docker pull grantmacken/alpine-xqerl
 ```
 
-xqerl is in constant development, so I have also tagged images with the [master](https://github.com/zadean/xqerl)
-commit sha, which are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl/tags)
 
 <!--
-https://github.com/zadean/xqerl/commit/64558530421e1bc53451754361282ac1dbea8b4f 
 -->
 
 
@@ -21,11 +18,11 @@ https://github.com/zadean/xqerl/commit/64558530421e1bc53451754361282ac1dbea8b4f
  [Zachary Dean](https://github.com/zadean),
  is an Erlang XQuery 3.1 Processor and XML Database.
 
+
+
 #Intro
 
 TODO!
-
-
 
 
 ## Available Alpine Images 
@@ -33,31 +30,67 @@ TODO!
 1. shell: a clone of xqerl repo with the entry point via `rebar3 shell` 
 2. production release: a smallish production ready deploy image
 
+## Shell: A Fat Playground Desktop Image
+
+There is image is tagged 'shell'
+
+```
+docker run -it --rm grantmacken/alpine-xqerl:shell
+```
+
+This starts xqerl from ENTRYPOINT `rebar3 shell` to pop you into
+the *interactive* erlang shell. 
+The container contains a clone the  [xqerl repo](https://zadean.github.io/xqerl) so from here you should be able to follow the 
+[Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md)
+tutorial from section 4 onwards.
+
+If you have a OS with 'systemd' init system (i.e. most modern linux OS),
+you may also want to view the xqerl logged output from the container. 
+
+```
+docker run \
+  -it --rm \
+  --name xqShell \
+  --publish 8081:8081 \
+  --log-driver=journald \
+  grantmacken/alpine-xqerl:shell
+```
+
+Now in the erlang shell, as you work through the [Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md) tutorial,
+in another terminal you can follow the container logged output, by using the following command.
+
+```
+sudo journalctl -b CONTAINER_NAME=xqShell --all -f
+```
+
 ## Smallish Deploy Image
 
 ```
-docker pull grantmacken/alpine-xqerl:latest
+docker pull grantmacken/alpine-xqerl
 ```
 
-Or you can pull the same image, tagged with the xqerl semver versioning,
-which currently stands at [ 0.8.1 ]
-
-
-This is a smallish  'deploy' image, where a binary executable boots the xqerl environment,
+This is a smallish (42.3MB) 'deploy' image, where a binary executable boots the xqerl environment,
 
 ```
 ENTRYPOINT ["./bin/xqerl","foreground" ]
 ```
 
-The easiest way to use this image is through docker-compose.
+[xqerl](https://zadean.github.io/xqerl) is in constant development, so I have also tagged images with the [master](https://github.com/zadean/xqerl) commit sha.  These tagged images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl/tags)
+If you are testing or setting up a xqerl development environment, then it is advisable to use the latest sha tagged images.
+Any [xqerl issues](https://zadean.github.io/xqerl/issues) when developing with xqerl can be communicated back to the repo owner using the commit sha as a reference.
+
+
+# Setting up a xqerl dev environment
+
+Perhaps the easiest way to use this image is through docker-compose.
 I have provided and example 'docker-compose.yml' and '.env' 
 which you can copy/clone and modify to use to boot your xqerl project.
 
 The docker-compose run time environment includes
 * A container name 'xq'
 * Two persistent docker volumes 
-    1. A volume named 'data' which holds the database data
-    2. A volume name 'code' which holds the compiled xQuery  beam files 
+    1. A volume named 'xqData' which holds the database data
+    2. A volume name 'xqCode' which holds the compiled xQuery  beam files 
 * A network named 'www' 
 * A port published on 8081
 
@@ -92,39 +125,6 @@ The following cast
 [![asciicast](https://asciinema.org/a/264230.svg)](https://asciinema.org/a/264230)
 
 
-## Fat Playground Desktop Image
-
-This image is tagged 'shell'
-
-```
-docker run -it --rm grantmacken/alpine-xqerl:shell
-```
-
-This starts xqerl from ENTRYPOINT `rebar3 shell` to pop you into
-the *interactive* erlang shell. 
-The container contains a clone the  [xqerl repo](https://zadean.github.io/xqerl) so from here you should be able to follow the 
-[Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md)
-tutorial from section 4 onwards.
-
-If you have a OS with 'systemd' init system (i.e. most modern linux OS),
-you may also want to view the xqerl logged output from the container. 
-
-```
-docker run \
-  -it --rm \
-  --name xqShell \
-  --network www \
-  --publish 8081:8081 \
-  --log-driver=journald \
-  grantmacken/alpine-xqerl:shell
-```
-
-Now in the erlang shell, as you work through the [Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md) tutorial,
-in another terminal you can follow the container logged output, by using the following command.
-
-```
-sudo journalctl -b CONTAINER_NAME=xqShell --all -f
-```
 
 
 

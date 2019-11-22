@@ -6,23 +6,20 @@ services:
     ports:
       - ${XQERL_PORT}:${XQERL_PORT}
     volumes:     
-      - type: bind
-        source: ./fixtures
-        target: ${XQERL_HOME}/fixtures
-    #     - type: volume
-    #       source: db
-    #       target: ${XQERL_HOME}/${DATA_DIR}
-    #     - type: volume
-    #       source: code
-    #       target: ${XQERL_HOME}/${CODE_DIR}
+      - type: volume
+        source: db
+        target: ${XQERL_HOME}/data
+      - type: volume
+        source: code
+        target: ${XQERL_HOME}/code
 
-# volumes:
-  # db:
-    # driver: local
-    # name: ${DATA_DIR}
-  # code:
-    # driver: local
-    # name: ${CODE_DIR}
+volumes:
+  db:
+    driver: local
+    name: ${DATA_DIR}
+  code:
+    driver: local
+    name: ${CODE_DIR}
 
 networks:
   default:
