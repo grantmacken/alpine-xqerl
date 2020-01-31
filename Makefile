@@ -22,9 +22,7 @@ tag now from zadean git heads/master ref sha
 
 endef
 
-help: export HELP=$(mkHelp)
-help:
-	@echo "$${HELP}"
+
 
 HEAD_SHA != curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/master | jq -Mr '.object.sha'
 THIS_SHA != grep -oP 'REPO_SHA=\K(.+)' .env
@@ -54,11 +52,6 @@ up:
 down:
 	@docker-compose down
 
-.PHONY: push
-push:
-	@echo '## $@ ##'
-	@docker push $(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(REPO_SHA))
-
 .PHONY: clean
 clean:
 	@#docker image prune -a
@@ -69,4 +62,6 @@ clean:
 network: 
 	@docker network create $(NETWORK)
 
-
+help: export HELP=$(mkHelp)
+help:
+	@echo "$${HELP}"

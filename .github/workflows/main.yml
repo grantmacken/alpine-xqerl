@@ -22,19 +22,18 @@ jobs:
           docker buildx build \
           --target "shell" \
           --output "type=docker" \
-          --tag "${DOCKER_IMAGE}:$(date --iso)-shell" \
-          --tag "${DOCKER_IMAGE}:shell" \
+          --tag "${REPO_OWNER}/${REPO_NAME}:$(date --iso)-shell" \
+          --tag "${REPO_OWNER}/${REPO_NAME}:shell" \
           .                                     
           docker buildx build \
-          --target "min" \
           --output "type=docker" \
-          --tag "${DOCKER_IMAGE}:$(date --iso)-min" \
-          --tag "${DOCKER_IMAGE}:latest" \
-          --tag "${DOCKER_IMAGE}:${REPO_SHA}" \
+          --tag "${REPO_OWNER}/${REPO_NAME}:latest" \
+          --tag "${REPO_OWNER}/${REPO_NAME}:${REPO_SHA}" \
+          --tag  "docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${XQERL_CONTAINER_NAME}:${GHPKG_VER}" \
           .
       - name: Build Docker Image From xqerl repo
-        run: make build
-      - name: Bring up xq container
+        run: make
+      - name: Bring Up xq Container
         run: |
           make network
           make up
@@ -51,37 +50,42 @@ jobs:
         run: |
           make db-can-insert
           make db-can-get
-          #make db-can-delete
-      - name: restXQ Checks
-        run: |
-          make routes
-          make route-head
-          make route-head-redirect
-          make route-get-xml
-          make route-get-csv
-          make route-get-json
-          make route-get-html
-          printf %60s | tr ' ' '=' && echo
-          echo 'Accepting HTML form posted data'
-          make route-post-form
-          make route-form-multi
-          echo 'Accepting posted data'
-          make route-post-xml-file
-          printf %60s | tr ' ' '=' && echo
-      - name: Create, Update Delete, DB resources via restXQ
-        run: |
-          make route-create
-          make route-get-created-resource
-          make route-delete-resource
+          ##make db-can-delete
+      #- name: restXQ Checks
+        #run: |
+          #make routes
+          #make route-head
+          #make route-head-redirect
+          #make route-get-xml
+          #make route-get-csv
+          #make route-get-json
+          #make route-get-html
+          #printf %60s | tr ' ' '=' && echo
+          #echo 'Accepting HTML form posted data'
+          #make route-post-form
+          #make route-form-multi
+          #echo 'Accepting posted data'
+          #make route-post-xml-file
+          #printf %60s | tr ' ' '=' && echo
+      #- name: Create, Update Delete, DB resources via restXQ
+        #run: |
+          #make route-create
+          #make route-get-created-resource
+          #make route-delete-resource
       - name: Take Down Docker Container
         run: make down
-      - name: Docker Login In and Push to dockerhub
+      - name: Dockerhub Login In and Push to dockerhub
         run: |
-          pwd
-          ls -al .
           source .env
           echo "${DOCKER_TAG}"
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin 
-          make push
-          make push TARGET=latest
-          make push TARGET=shell
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io --username ${REPO_OWNER} --password-stdin 
+          docker push ${REPO_OWNER}/${REPO_NAME}:$(date --iso)-shell
+          docker push ${REPO_OWNER}/${REPO_NAME}:shell
+          docker push ${REPO_OWNER}/${REPO_NAME}:latest
+          docker push ${REPO_OWNER}/${REPO_NAME}:${REPO_SHA}
+      - name: Github Login In and Push to Github Packages
+        run: |
+          source .env
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin
+          docker push docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${XQERL_CONTAINER_NAME}:${GHPKG_VER}
+

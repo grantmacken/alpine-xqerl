@@ -26,16 +26,6 @@ RUN --mount=type=cache,target=/home/.cache/rebar3 \
 WORKDIR /home/xqerl
 ENTRYPOINT ["rebar3", "shell"]
 
-# NOTE: could do a dev release stage
-# FROM shell as rel
-# RUN apk add --update git \
-#     && cd /home/xqerl \
-#     && rebar3 as prod tar \
-#     && rebar3 release \
-#     && ln -s ${REBAR_BASE_DIR}/default/rel/xqerl/bin/xqerl /usr/local/bin/xqerl
-
-# ENTRYPOINT ["xqerl","console" ]
-
 FROM shell as prod
 
 RUN --mount=type=cache,target=/var/cache/apk \ 
@@ -56,7 +46,6 @@ RUN  --mount=type=cache,target=/var/cache/apk \
       && ln -s /usr/local/xqerl/bin/xqerl /usr/local/bin/xqerl \
       && mkdir /usr/local/xqerl/bin/scripts \
       && mkdir /usr/local/xqerl/code/src 
-
 
 ENV XQERL_HOME /usr/local/xqerl
 ENV XQERL_NAME xqerl@127.0.0.1

@@ -6,7 +6,6 @@ Pre-built images are available on [dockerhub](https://hub.docker.com/r/grantmack
 docker pull grantmacken/alpine-xqerl
 ```
 
-
 <!--
 -->
 
@@ -17,8 +16,6 @@ docker pull grantmacken/alpine-xqerl
  maintained by 
  [Zachary Dean](https://github.com/zadean),
  is an Erlang XQuery 3.1 Processor and XML Database.
-
-
 
 #Intro
 
