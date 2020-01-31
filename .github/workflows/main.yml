@@ -79,7 +79,6 @@ jobs:
           source .env
           echo "${DOCKER_TAG}"
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io --username ${REPO_OWNER} --password-stdin 
-          docker push ${REPO_OWNER}/${REPO_NAME}:$(date --iso)-shell
           docker push ${REPO_OWNER}/${REPO_NAME}:shell
           docker push ${REPO_OWNER}/${REPO_NAME}:latest
           docker push ${REPO_OWNER}/${REPO_NAME}:${REPO_SHA}

@@ -27,14 +27,24 @@ endef
 HEAD_SHA != curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/master | jq -Mr '.object.sha'
 THIS_SHA != grep -oP 'REPO_SHA=\K(.+)' .env
 
-.PHONY: build
-build: sha
+.PHONY: prod
+prod: shell
 	@export DOCKER_BUILDKIT=1;
 	LATEST=$(THIS_SHA);\
   docker buildx build -o type=docker \
-  --target="$(if $(TARGET),$(TARGET),min)" \
-  --tag="$(DOCKER_IMAGE):$(if $(TARGET),$(TARGET),$(THIS_SHA))" \
-  --tag="$(DOCKER_IMAGE):latest" \
+  --tag="$(REPO_OWNER)/$(REPO_NAME):$(THIS_SHA)" \
+  --tag="$(REPO_OWNER)/$(REPO_NAME):latest" \
+  --tag="docker.pkg.github.com/$(REPO_OWNER)/$(REPO_NAME)/$(XQERL_CONTAINER_NAME):$(GHPKG_VER)" \
+ .
+	@echo
+
+.PHONY: shell
+shell: sha
+	@export DOCKER_BUILDKIT=1;
+	LATEST=$(THIS_SHA);\
+  docker buildx build -o type=docker \
+  --target shell \
+  --tag="$(REPO_OWNER)/$(REPO_NAME):shell" \
  .
 	@echo
 
