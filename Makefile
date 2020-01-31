@@ -1,28 +1,12 @@
 include .env
-include inc/checks.mk
-include inc/run.mk
+# include inc/checks.mk
+# include inc/run.mk
 
 #XQN=shell
 XQN=$(XQERL_CONTAINER_NAME)
 EVAL=docker exec $(XQN) xqerl eval
 
 Address = http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQN) ):8081
-
-define mkHelp
--------------------------------------------------------------------------------
-targets:
- - to build docker image
-make build 
- - to build image only to shell target
-make build TARGET=shell
-
--------------------------------------------------------------------------------
-Note:
-tag now from zadean git heads/master ref sha
-
-endef
-
-
 
 HEAD_SHA != curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/master | jq -Mr '.object.sha'
 THIS_SHA != grep -oP 'REPO_SHA=\K(.+)' .env
@@ -71,6 +55,22 @@ clean:
 .PHONY: network 
 network: 
 	@docker network create $(NETWORK)
+
+define mkHelp
+-------------------------------------------------------------------------------
+targets:
+ - to build docker image
+make build 
+ - to build image only to shell target
+make build TARGET=shell
+
+-------------------------------------------------------------------------------
+Note:
+tag now from zadean git heads/master ref sha
+
+endef
+
+
 
 help: export HELP=$(mkHelp)
 help:
