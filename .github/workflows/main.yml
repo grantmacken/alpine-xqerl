@@ -15,7 +15,7 @@ jobs:
         run: |
           make shell
           make
-          - name: Dockerhub Login In and Push to dockerhub
+     - name: Dockerhub Login In and Push to dockerhub
         run: |
           source .env
           echo "${DOCKER_TAG}"
