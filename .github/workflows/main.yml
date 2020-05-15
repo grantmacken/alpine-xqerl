@@ -8,15 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           fetch-depth: 1
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
-        with:
-          version: latest
-      - name: Run Buildx
+      - name: make docker images
         run: |
           source .env
           docker buildx build \
@@ -24,7 +19,7 @@ jobs:
           --output "type=docker" \
           --tag "${REPO_OWNER}/${REPO_NAME}:$(date --iso)-shell" \
           --tag "${REPO_OWNER}/${REPO_NAME}:shell" \
-          .                                     
+          .
           docker buildx build \
           --output "type=docker" \
           --tag "${REPO_OWNER}/${REPO_NAME}:latest" \
