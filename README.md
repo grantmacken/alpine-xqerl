@@ -24,12 +24,10 @@ TODO!
 
 ## Available Alpine Images 
 
-1. shell: a clone of xqerl repo with the entry point via `rebar3 shell` 
+1. shell: this a clone of xqerl repo with the entry point via `rebar3 shell` 
 2. production release: a smallish production ready deploy image
 
 ## Shell: A Fat Playground Desktop Image
-
-There is image is tagged 'shell'
 
 ```
 docker run -it --rm grantmacken/alpine-xqerl:shell
@@ -66,7 +64,7 @@ sudo journalctl -b CONTAINER_NAME=xqShell --all -f
 docker pull grantmacken/alpine-xqerl
 ```
 
-This is a smallish (42.3MB) 'deploy' image, where a binary executable boots the xqerl environment,
+This is a smallish (about 42MB) 'deploy' image, where a binary executable boots the xqerl environment,
 
 ```
 ENTRYPOINT ["./bin/xqerl","foreground" ]
@@ -112,6 +110,13 @@ docker exec commands, like this ...
 docker exec xq ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
 docker exec xq ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \")."
 ```
+
+The above is not to very useful, so to really get started the thing first things you need to check out, 
+is the [xqerl documentation](https://zadean.github.io/xqerl/).
+There you will learn how how to ...
+- compile your xquery files so the run on the OTP beam
+- store update and retrieve data from the xqerl database
+- use restXQ to create a restful web facing applications and APIs
 
 The following cast 
 1. brings the container up `docker-compose up -d`
