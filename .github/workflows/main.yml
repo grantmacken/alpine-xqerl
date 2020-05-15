@@ -11,21 +11,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
-      - name: make docker images
-        run: |
-          source .env
-          docker buildx build \
-          --target "shell" \
-          --output "type=docker" \
-          --tag "${REPO_OWNER}/${REPO_NAME}:$(date --iso)-shell" \
-          --tag "${REPO_OWNER}/${REPO_NAME}:shell" \
-          .
-          docker buildx build \
-          --output "type=docker" \
-          --tag "${REPO_OWNER}/${REPO_NAME}:latest" \
-          --tag "${REPO_OWNER}/${REPO_NAME}:${REPO_SHA}" \
-          --tag  "docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${XQERL_CONTAINER_NAME}:${GHPKG_VER}" \
-          .
       - name: Build Docker Image From xqerl repo
         run: make
       # - name: Bring Up xq Container
