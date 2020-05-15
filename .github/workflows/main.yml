@@ -3,29 +3,29 @@ name: CI
 on:
   push:
     branches: master
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-      - name: Build Docker Image From xqerl repo
-        run: |
-          make shell
-          make
-     - name: Dockerhub Login In and Push to dockerhub
-       run: |
-          source .env
-          echo "${DOCKER_TAG}"
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io --username ${REPO_OWNER} --password-stdin 
-          docker push ${REPO_OWNER}/${REPO_NAME}:shell
-          docker push ${REPO_OWNER}/${REPO_NAME}:latest
-          docker push ${REPO_OWNER}/${REPO_NAME}:${REPO_SHA}
-    - name: Github Login In and Push to Github Packages
-        run: |
-          source .env
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin
-          docker push docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${XQERL_CONTAINER_NAME}:${GHPKG_VER}
+    jobs:
+      build:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout Repo
+            uses: actions/checkout@v2
+            with:
+              fetch-depth: 1
+          - name: Build Docker Image From xqerl repo
+            run: |
+              make shell
+              make
+          - name: Dockerhub Login In and Push to dockerhub
+            run: |
+              source .env
+              echo "${DOCKER_TAG}"
+              echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io --username ${REPO_OWNER} --password-stdin 
+              docker push ${REPO_OWNER}/${REPO_NAME}:shell
+              docker push ${REPO_OWNER}/${REPO_NAME}:latest
+              docker push ${REPO_OWNER}/${REPO_NAME}:${REPO_SHA}
+          - name: Github Login In and Push to Github Packages
+            run: |
+              source .env
+              echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin
+              docker push docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${XQERL_CONTAINER_NAME}:${GHPKG_VER}
 
