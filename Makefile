@@ -20,12 +20,10 @@ THIS_SHA != grep -oP 'REPO_SHA=\K(.+)' .env
 
 .PHONY: build
 build: shell
-	@LATEST=$(THIS_SHA); docker buildx build --output "type=image,push=false" \
+	@docker buildx build --output "type=image,push=false" \
   --tag="$(REPO_OWNER)/$(REPO_NAME):$(THIS_SHA)" \
   --tag="$(REPO_OWNER)/$(REPO_NAME):latest" \
   --tag="docker.pkg.github.com/$(REPO_OWNER)/$(REPO_NAME)/$(XQERL_CONTAINER_NAME):$(GHPKG_VER)" \
-  --build-arg CONFIG_PORT='$(CONFIG_PORT)' \
-  --build-arg XQERL_HOME='$(XQERL_HOME)' \
  .
 	@echo
 
@@ -118,7 +116,7 @@ rebar.config:
 
 .PHONY: shell
 shell: sha xqerl.config rebar.config 
-	@LATEST=$(THIS_SHA); docker buildx build --output "type=image,push=false" \
+	@docker buildx build --output "type=image,push=false" \
   --target $@ \
   --tag="$(REPO_OWNER)/$(REPO_NAME):$@" \
  .

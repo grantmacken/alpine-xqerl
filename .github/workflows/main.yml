@@ -12,49 +12,10 @@ jobs:
         with:
           fetch-depth: 1
       - name: Build Docker Image From xqerl repo
-        run: make
-      # - name: Bring Up xq Container
-      #   run: |
-      #     make network
-      #     make up
-      #     sleep 5
-      #     make info
-      #     make inspect
-      # - name: Some Can Do Checks
-      #   run: |
-      #     # make check-can-run-expression
-      #     # make check-copy-into-container
-      #     make check-can-compile
-      #     make check-can-use-external
-      # - name: DB Checks
-      #   run: |
-      #     make db-can-insert
-      #     make db-can-get
-          ##make db-can-delete
-      #- name: restXQ Checks
-        #run: |
-          #make routes
-          #make route-head
-          #make route-head-redirect
-          #make route-get-xml
-          #make route-get-csv
-          #make route-get-json
-          #make route-get-html
-          #printf %60s | tr ' ' '=' && echo
-          #echo 'Accepting HTML form posted data'
-          #make route-post-form
-          #make route-form-multi
-          #echo 'Accepting posted data'
-          #make route-post-xml-file
-          #printf %60s | tr ' ' '=' && echo
-      #- name: Create, Update Delete, DB resources via restXQ
-        #run: |
-          #make route-create
-          #make route-get-created-resource
-          #make route-delete-resource
-      # - name: Take Down Docker Container
-      #   run: make down
-      - name: Dockerhub Login In and Push to dockerhub
+        run: |
+          make shell
+          make
+          - name: Dockerhub Login In and Push to dockerhub
         run: |
           source .env
           echo "${DOCKER_TAG}"

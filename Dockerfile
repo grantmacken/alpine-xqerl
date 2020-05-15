@@ -3,12 +3,9 @@
 # @ref: https://github.com/grantmacken/alpine-xqerl
 #@https://github.com/erlang/docker-erlang-otp
 
-ARG ALPINE_VERSION=3.11
 
 FROM erlang:23-alpine as shell
 LABEL maintainer="Grant MacKenzie <grantmacken@gmail.com>"
-
-
 
 WORKDIR /home
 COPY .env  rebar.config xqerl.config ./
@@ -48,7 +45,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
     && tar -zxvf ${REBAR_BASE_DIR}/prod/rel/*/*.tar.gz -C /usr/local/xqerl
 
 
-FROM alpine:${ALPINE_VERSION} as min
+FROM alpine:3.11
 COPY --from=prod /usr/local/xqerl /usr/local/xqerl
 
 RUN  --mount=type=cache,target=/var/cache/apk \
