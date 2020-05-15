@@ -6,10 +6,6 @@ Pre-built images are available on [dockerhub](https://hub.docker.com/r/grantmack
 docker pull grantmacken/alpine-xqerl
 ```
 
-<!--
--->
-
-
 [![](https://github.com/grantmacken/alpine-xqerl/workflows/CI/badge.svg)](https://github.com/grantmacken/alpine-xqerl/actions)
 
  [xqerl](https://zadean.github.io/xqerl)
@@ -17,7 +13,11 @@ docker pull grantmacken/alpine-xqerl
  [Zachary Dean](https://github.com/zadean),
  is an Erlang XQuery 3.1 Processor and XML Database.
 
-#Intro
+## recent updates
+ - [x] alpine 3.11 docker OS
+ - [X] [OTP 23](https://www.erlang.org/news) latest release 
+
+## Intro
 
 TODO!
 
@@ -114,7 +114,7 @@ docker exec xq ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs')
 The above is not to very useful, so to really get started the thing first things you need to check out, 
 is the [xqerl documentation](https://zadean.github.io/xqerl/).
 There you will learn how how to ...
-- compile your xquery files so the run on the OTP beam
+- compile your xquery files so they run on the [OTP beam](https://en.wikipedia.org/wiki/BEAM_(Erlang_virtual_machine))
 - store update and retrieve data from the xqerl database
 - use restXQ to create a restful web facing applications and APIs
 
