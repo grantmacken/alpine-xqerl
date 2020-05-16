@@ -32,6 +32,24 @@ clean:
 	@rm -f xqerl.config rebar.config
 	@#docker rmi $$(docker images -a | grep "xqerl" | awk '{print $$3}')
 
+.PHONY: shell
+shell: sha xqerl.config rebar.config 
+	@docker buildx build --output "type=image,push=false" \
+  --target $@ \
+  --tag="$(REPO_OWNER)/$(REPO_NAME):$@" \
+ .
+	@echo
+
+.PHONY: sha
+sha:
+	@echo "previous commit sha: $(THIS_SHA)"
+	@LATEST=$(HEAD_SHA);
+	@echo "  latest commit sha: $$LATEST";
+	if [ ! "$$LATEST" = "$(THIS_SHA)" ]; 
+	then sed -i 's/REPO_SHA.*/REPO_SHA=$(HEAD_SHA)/' .env
+	fi
+	sed -i 's%docker pull grantmacken/alpine-xqerl:.*%docker pull grantmacken/alpine-xqerl:$(HEAD_SHA)%g' README.md
+
 xqerl.config:
 	@cat << EOF | tee $@
 	%% -------------------------------------------------------------------
@@ -113,20 +131,9 @@ rebar.config:
 	    {mkdir, "code"},
 	    {mkdir, "data"}]}
 	]}.
+	EOF
 
-.PHONY: shell
-shell: sha xqerl.config rebar.config 
-	@docker buildx build --output "type=image,push=false" \
-  --target $@ \
-  --tag="$(REPO_OWNER)/$(REPO_NAME):$@" \
- .
-	@echo
-
-.PHONY: sha
-sha:
-	@echo "previous commit sha: $(THIS_SHA)"
-	@LATEST=$(HEAD_SHA);echo "  latest commit sha: $$LATEST";\
-  if [ ! "$$LATEST" = "$(THIS_SHA)" ]; then sed -i 's/REPO_SHA.*/REPO_SHA=$(HEAD_SHA)/' .env ; fi
+##################################################################
 
 .PHONY: up
 up:
@@ -136,35 +143,12 @@ up:
 down:
 	@docker-compose down
 
-
-
 .PHONY: network 
 network: 
 	@docker network create $(NETWORK)
-
-define mkHelp
--------------------------------------------------------------------------------
-targets:
- - to build docker image
-make build 
- - to build image only to shell target
-make build TARGET=shell
-
--------------------------------------------------------------------------------
-Note:
-tag now from zadean git heads/master ref sha
-
-endef
-
-
-
-help: export HELP=$(mkHelp)
-help:
-	@echo "$${HELP}"
 
 .PHONY: run-shell
 run-shell:
 	@docker run  -it --rm \
   --name  xqShell \
   $(DOCKER_IMAGE):shell
-
