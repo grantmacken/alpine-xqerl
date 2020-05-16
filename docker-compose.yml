@@ -4,22 +4,21 @@ services:
     image: ${DOCKER_IMAGE}:${REPO_SHA}
     container_name: ${XQERL_CONTAINER_NAME}
     ports:
-      - ${XQERL_PORT}:${CONFIG_PORT}
-    volumes:     
+      - ${CONFIG_PORT}:${CONFIG_PORT}
+    volumes:
       - type: volume
         source: db
-        target: ${XQERL_HOME}/data
+        target: ${XQERL_HOME}/${CONFIG_DATA_DIR}
       - type: volume
         source: code
-        target: ${XQERL_HOME}/code
-
+        target: ${XQERL_HOME}/${CONFIG_CODE_DIR}
 volumes:
   db:
     driver: local
-    name: ${DATA_DIR}
+    name: ${CONFIG_DATA_DIR}
   code:
     driver: local
-    name: ${CODE_DIR}
+    name: ${CONFIG_CODE_DIR}
 
 networks:
   default:
