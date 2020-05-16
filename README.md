@@ -1,11 +1,5 @@
 # [alpine-xqerl](https://github.com/grantmacken/alpine-xqerl)
 
-Pre-built images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl)
-
-```
-docker pull grantmacken/alpine-xqerl
-```
-
 [![](https://github.com/grantmacken/alpine-xqerl/workflows/CI/badge.svg)](https://github.com/grantmacken/alpine-xqerl/actions)
 
  [xqerl](https://zadean.github.io/xqerl)
@@ -16,16 +10,26 @@ docker pull grantmacken/alpine-xqerl
 ## recent updates
  - [x] alpine 3.11 docker OS
  - [X] [OTP 23](https://www.erlang.org/news) latest release 
+ - [x] built from latest xqerl [merge commit](https://api.github.com/repos/zadean/xqerl/git/commits/1e1fb2004445338acf55f95ea571cfb3a3521722)
+ - [x] uses config values in .env file to set some xqerl.config values. This is of interest only if you wish to build the image
+   yourself. In xqerl repo the  `./config/xqerl.config`, item `environment_access` is set to `false`. Our docker image
+   is built with this var set to `true`. If you want to keep the default, clone this repo and in the file `.env` set `CONFIG_ENVIRONMENT_ACCESS=true`, then run `make` to build the image.
 
-## Intro
+[xqerl](https://zadean.github.io/xqerl) is in constant development, so I have also tagged images with the xqerl [master](https://github.com/zadean/xqerl) git commit sha.  These tagged images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl/tags)
+If you are testing or setting up a xqerl development environment, then it is advisable to use the latest sha tagged images.
+Any [xqerl issues](https://zadean.github.io/xqerl/issues) when developing with xqerl can be communicated back to the [repo owner](https://github.com/zadean) using the commit sha as a reference.
 
-TODO!
+```
+docker pull grantmacken/alpine-xqerl:d376ee8727f26774f54767131bcc1a6d15b26e18
+```
 
+Other pre-built images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl)
+The latest xqerl docker release is also on [github packages](https://github.com/grantmacken/alpine-xqerl/packages)
 
-## Available Alpine Images 
-
+On [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl) I have provided two images
+ 
 1. shell: this a clone of xqerl repo with the entry point via `rebar3 shell` 
-2. production release: a smallish production ready deploy image
+2. production release: a smallish production ready deploy image.
 
 ## Shell: A Fat Playground Desktop Image
 
@@ -43,13 +47,15 @@ If you have a OS with 'systemd' init system (i.e. most modern linux OS),
 you may also want to view the xqerl logged output from the container. 
 
 ```
+docker network create --driver=bridge www
 docker run \
   -it --rm \
   --name xqShell \
   --publish 8081:8081 \
   --log-driver=journald \
-  grantmacken/alpine-xqerl:shell
-```
+  --network www
+  ```
+
 
 Now in the erlang shell, as you work through the [Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md) tutorial,
 in another terminal you can follow the container logged output, by using the following command.
@@ -58,24 +64,39 @@ in another terminal you can follow the container logged output, by using the fol
 sudo journalctl -b CONTAINER_NAME=xqShell --all -f
 ```
 
-## Smallish Deploy Image
-
-```
-docker pull grantmacken/alpine-xqerl
-```
+## Smallish Deployable Image
 
 This is a smallish (about 42MB) 'deploy' image, where a binary executable boots the xqerl environment,
 
+ Prior to running the container, I suggest you create a docker **network** and some docker **volumes**.
+Creating a prior *network*, allows a running xqerl container to join a network rather than creating a new network each time the container is started.
+
+Created docker *volumes* allow us to persist our 'xquery code' and any data in the 'xqerl database'. 
+We could mount bind, to a local directory, but created named volumes are more portable.
+
 ```
-ENTRYPOINT ["./bin/xqerl","foreground" ]
+docker network create --driver=bridge www
+docker volume  create --driver=local --name xqerl-compiled-code
+docker volume  create --driver=local --name xqerl-database
 ```
 
-[xqerl](https://zadean.github.io/xqerl) is in constant development, so I have also tagged images with the [master](https://github.com/zadean/xqerl) commit sha.  These tagged images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl/tags)
-If you are testing or setting up a xqerl development environment, then it is advisable to use the latest sha tagged images.
-Any [xqerl issues](https://zadean.github.io/xqerl/issues) when developing with xqerl can be communicated back to the repo owner using the commit sha as a reference.
+Once the docker network and volumes are in place we can run the container.
+
+```
+docker run \
+ --rm \
+ --name xq \
+ --mount type=volume,target=/usr/local/xqerl/code,source=xqerl-compiled-code \
+ --mount type=volume,target=/usr/local/xqerl/data,source=xqerl-database \
+ --publish 8081:8081 \
+ --network www \
+ --detatch \
+ --publish 8081:8081 \
+ grantmacken/alpine-xqerl
+```
 
 
-# Setting up a xqerl dev environment
+# Using docker-compose
 
 Perhaps the easiest way to use this image is through docker-compose.
 I have provided and example 'docker-compose.yml' and '.env' 
@@ -84,8 +105,8 @@ which you can copy/clone and modify to use to boot your xqerl project.
 The docker-compose run time environment includes
 * A container name 'xq'
 * Two persistent docker volumes 
-    1. A volume named 'xqData' which holds the database data
-    2. A volume name 'xqCode' which holds the compiled xQuery  beam files 
+    1. A volume named 'data' which holds the database data
+    2. A volume name 'code' which holds the compiled xQuery  beam files 
 * A network named 'www' 
 * A port published on 8081
 
