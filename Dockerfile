@@ -44,8 +44,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
     && mkdir /usr/local/xqerl \
     && tar -zxvf ${REBAR_BASE_DIR}/prod/rel/*/*.tar.gz -C /usr/local/xqerl
 
-
-FROM alpine:3.11
+FROM alpine:3.12.0
 COPY --from=prod /usr/local/xqerl /usr/local/xqerl
 
 RUN  --mount=type=cache,target=/var/cache/apk \
