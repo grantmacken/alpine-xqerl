@@ -15,7 +15,8 @@
    yourself. In xqerl repo the  `./config/xqerl.config`, item `environment_access` is set to `false`. Our docker image
    is built with this var set to `true`. If you want to keep the default, clone this repo and in the file `.env` set `CONFIG_ENVIRONMENT_ACCESS=true`, then run `make` to build the image.
 
-[xqerl](https://zadean.github.io/xqerl) is in constant development, so I have also tagged images with the xqerl [master](https://github.com/zadean/xqerl) git commit sha.  These tagged images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl/tags)
+[xqerl](https://zadean.github.io/xqerl) is in constant development, 
+so I have also tagged images with the xqerl [main](https://github.com/zadean/xqerl) git commit sha.  These tagged images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl/tags)
 If you are testing or setting up a xqerl development environment, then it is advisable to use the latest sha tagged images.
 Any [xqerl issues](https://zadean.github.io/xqerl/issues) when developing with xqerl can be communicated back to the [repo owner](https://github.com/zadean) using the commit sha as a reference.
 
@@ -28,8 +29,8 @@ The latest xqerl docker release is also on [github packages](https://github.com/
 
 On [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl) I have provided two images
  
-1. shell: this a clone of xqerl repo with the entry point via `rebar3 shell` 
-2. production release: a smallish production ready deploy image.
+1. interactive erlang shell: This image is a clone of xqerl repo with the entry point via `rebar3 shell` 
+2. production release: a smallish internet deploy image
 
 ## Shell: A Fat Playground Desktop Image
 
@@ -56,7 +57,6 @@ docker run \
   --network wrk
   ```
 
-
 Now in the erlang shell, as you work through the [Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md) tutorial,
 in another terminal you can follow the container logged output, by using the following command.
 
@@ -64,7 +64,7 @@ in another terminal you can follow the container logged output, by using the fol
 sudo journalctl -b CONTAINER_NAME=xqShell --all -f
 ```
 
-## Smallish Deployable Image
+## Smallish Internet Deployable Image
 
 This is a smallish (about 42MB) 'deploy' image, where a binary executable boots the xqerl environment,
 
@@ -94,7 +94,6 @@ docker run \
  --publish 8081:8081 \
  grantmacken/alpine-xqerl
 ```
-
 
 # Using docker-compose
 
