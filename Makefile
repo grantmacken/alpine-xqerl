@@ -15,7 +15,7 @@ EVAL=docker exec $(XQERL_CONTAINER_NAME) xqerl eval
 
 Address = http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQERL_CONTAINER_NAME)):$(CONFIG_PORT)
 
-HEAD_SHA != curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/master | jq -Mr '.object.sha'
+HEAD_SHA != curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/main | jq -Mr '.object.sha'
 THIS_SHA != grep -oP 'REPO_SHA=\K(.+)' .env
 
 .PHONY: build
@@ -46,9 +46,9 @@ sha:
 	@LATEST=$(HEAD_SHA);
 	@echo "  latest commit sha: $$LATEST";
 	if [ ! "$$LATEST" = "$(THIS_SHA)" ]; 
-	then sed -i 's/REPO_SHA.*/REPO_SHA=$(HEAD_SHA)/' .env
+	then sed -i 's/$(THIS_SHA)/$(HEAD_SHA)/' .env
 	fi
-	sed -i 's%docker pull grantmacken/alpine-xqerl:.*%docker pull grantmacken/alpine-xqerl:$(HEAD_SHA)%g' README.md
+	sed -i 's%$(THIS_SHA)%$(HEAD_SHA)%g' README.md
 
 xqerl.config:
 	@cat << EOF | tee $@
@@ -94,18 +94,18 @@ rebar.config:
 	@cat << EOF | tee $@
 	{minimum_otp_vsn, "21.2"}.
 	{deps,[
-	{xs_regex,    ".*", {git, "https://github.com/zadean/xs_regex.git",    {branch, "master"}}},
-	{xmerl_sax,   ".*", {git, "https://github.com/zadean/xmerl_sax.git",   {branch, "master"}}},
-	{erluca,      ".*", {git, "https://github.com/zadean/erluca.git",      {branch, "master"}}},
+	{xs_regex,    ".*", {git, "https://github.com/zadean/xs_regex.git",    {branch, "main"}}},
+	{xmerl_sax,   ".*", {git, "https://github.com/zadean/xmerl_sax.git",   {branch, "main"}}},
+	{erluca,      ".*", {git, "https://github.com/zadean/erluca.git",      {branch, "main"}}},
 	{merge_index, ".*", {git, "https://github.com/zadean/merge_index.git", {branch, "zadean"}}},
-	{emojipoo,    ".*", {git, "https://github.com/zadean/emojipoo.git",    {branch, "master"}}},
-	{htmerl,      ".*", {git, "https://github.com/zadean/htmerl.git",      {branch, "master"}}},
+	{emojipoo,    ".*", {git, "https://github.com/zadean/emojipoo.git",    {branch, "main"}}},
+	{htmerl,      ".*", {git, "https://github.com/zadean/htmerl.git",      {branch, "main"}}},
 	{hackney,     ".*", {git, "https://github.com/benoitc/hackney.git",    {branch, "master"}}},
 	{cowboy,      ".*", {git, "https://github.com/ninenines/cowboy.git",   {branch, "master"}}},
 	{sext,        ".*", {git, "https://github.com/uwiger/sext.git",        {branch, "master"}}},
 	{locks,       ".*", {git, "https://github.com/uwiger/locks.git",       {branch, "master"}}},
 	{uuid,        ".*", {git, "https://github.com/okeuday/uuid.git",       {tag, "v1.7.5"}}},
-	{basexerl,    ".*", {git, "https://github.com/zadean/basexerl.git",    {branch, "master"}}}
+	{basexerl,    ".*", {git, "https://github.com/zadean/basexerl.git",    {branch, "main"}}}
 	]}.
 	{erl_opts, [
 	  {i ,"include"},
