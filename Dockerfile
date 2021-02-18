@@ -1,10 +1,11 @@
 # syntax=docker/dockerfile:experimental
 # @ref: https://adoptingerlang.org/docs/production/docker# 
 # @ref: https://github.com/grantmacken/alpine-xqerl
-#@https://github.com/erlang/docker-erlang-otp
+#@ https://github.com/erlang/docker-erlang-otp
+# TODO automate FROM var like I do for SHA
 
 
-FROM erlang:23-alpine as shell
+FROM erlang:23.2.5-alpine as shell
 LABEL maintainer="Grant MacKenzie <grantmacken@gmail.com>"
 
 WORKDIR /home
@@ -44,7 +45,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
     && mkdir /usr/local/xqerl \
     && tar -zxvf ${REBAR_BASE_DIR}/prod/rel/*/*.tar.gz -C /usr/local/xqerl
 
-FROM alpine:3.12.0
+FROM alpine:3.13.2
 COPY --from=prod /usr/local/xqerl /usr/local/xqerl
 
 RUN  --mount=type=cache,target=/var/cache/apk \
