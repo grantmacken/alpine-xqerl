@@ -9,7 +9,6 @@ include .env
 
 # include inc/checks.mk
 # include inc/run.mk
-#XQN=shell
 XQN=$(XQERL_CONTAINER_NAME)
 EVAL=docker exec $(XQERL_CONTAINER_NAME) xqerl eval
 
