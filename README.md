@@ -8,9 +8,9 @@
  is an Erlang XQuery 3.1 Processor and XML Database.
 
 ## recent updates
- - [x] built from [alpine 3.12.0](https://hub.docker.com/_/alpine) docker OS
- - [X] [OTP 23](https://www.erlang.org/news) latest release 
- - [x] built from latest xqerl [merge commit](https://api.github.com/repos/zadean/xqerl/git/commits/fc2344e49895ee5ddbe5004956a4277a4d2bf65f)
+ - [x] built from [alpine 3.13.2](https://hub.docker.com/_/alpine) docker OS
+ - [X] [OTP 23.2.5](https://www.erlang.org/news) latest release 
+ - [x] built from latest xqerl [merge commit](https://api.github.com/repos/zadean/xqerl/git/commits/)
  - [x] uses config values in .env file to set some xqerl.config values. This is of interest only if you wish to build the image
    yourself. In xqerl repo the  `./config/xqerl.config`, item `environment_access` is set to `false`. Our docker image
    is built with this var set to `true`. If you want to keep the default, clone this repo and in the file `.env` set `CONFIG_ENVIRONMENT_ACCESS=true`, then run `make` to build the image.
@@ -21,7 +21,7 @@ If you are testing or setting up a xqerl development environment, then it is adv
 Any [xqerl issues](https://zadean.github.io/xqerl/issues) when developing with xqerl can be communicated back to the [repo owner](https://github.com/zadean) using the commit sha as a reference.
 
 ```
-docker pull grantmacken/alpine-xqerl:fc2344e49895ee5ddbe5004956a4277a4d2bf65f
+docker pull grantmacken/alpine-xqerl:
 ```
 
 Other pre-built images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl)
