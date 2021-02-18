@@ -4,7 +4,6 @@
 #@ https://github.com/erlang/docker-erlang-otp
 # TODO automate FROM var like I do for SHA
 
-
 FROM erlang:23.2.5-alpine as shell
 LABEL maintainer="Grant MacKenzie <grantmacken@gmail.com>"
 
