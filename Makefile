@@ -7,6 +7,7 @@ MAKEFLAGS += --no-builtin-rules
 
 include .env
 
+# include inc/run.mk
 XQN=$(XQERL_CONTAINER_NAME)
 EVAL=docker exec $(XQERL_CONTAINER_NAME) xqerl eval
 
