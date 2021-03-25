@@ -49,7 +49,7 @@ COPY --from=prod /usr/local/xqerl /usr/local/xqerl
 
 RUN  --mount=type=cache,target=/var/cache/apk \
       ln -vs /var/cache/apk /etc/apk/cache \
-      && apk add --update openssl ncurses \
+      && apk add --update openssl ncurses tzdata \
       && ln -s /usr/local/xqerl/bin/xqerl /usr/local/bin/xqerl \
       && mkdir /usr/local/xqerl/bin/scripts \
       && mkdir /usr/local/xqerl/code/src 
