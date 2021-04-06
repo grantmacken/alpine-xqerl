@@ -36,7 +36,7 @@ On [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl) I have provide
 ## Shell: A Fat Playground Desktop Image
 
 ```
-docker run -it --rm grantmacken/alpine-xqerl:shell
+make shell
 ```
 
 This starts xqerl from ENTRYPOINT `rebar3 shell` to pop you into
@@ -44,26 +44,6 @@ the *interactive* erlang shell.
 The container contains a clone the  [xqerl repo](https://zadean.github.io/xqerl) so from here you should be able to follow the 
 [Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md)
 tutorial from section 4 onwards.
-
-If you have a OS with 'systemd' init system (i.e. most modern linux OS),
-you may also want to view the xqerl logged output from the container. 
-
-```
-docker network create --driver=bridge wrk
-docker run \
-  -it --rm \
-  --name xqShell \
-  --publish 8081:8081 \
-  --log-driver=journald \
-  --network wrk
-  ```
-
-Now in the erlang shell, as you work through the [Getting Started](https://github.com/zadean/xqerl/blob/master/docs/src/GettingStarted.md) tutorial,
-in another terminal you can follow the container logged output, by using the following command.
-
-```
-sudo journalctl -b CONTAINER_NAME=xqShell --all -f
-```
 
 ## Smallish Internet Deployable Image
 
@@ -74,55 +54,20 @@ Creating a prior *network*, allows a running xqerl container to join a network r
 
 Created docker *volumes* allow us to persist our 'xquery code' and any data in the 'xqerl database'. 
 We could mount bind, to a local directory, but created named volumes are more portable.
-
-```
-docker network create --driver=bridge wrk
-docker volume  create --driver=local --name xqerl-compiled-code
-docker volume  create --driver=local --name xqerl-database
-```
-
 Once the docker network and volumes are in place we can run the container.
 
-```
-docker run \
- --rm \
- --name xq \
- --mount type=volume,target=/usr/local/xqerl/code,source=xqerl-compiled-code \
- --mount type=volume,target=/usr/local/xqerl/data,source=xqerl-database \
- --publish 8081:8081 \
- --network wrk \
- --detatch \
- --publish 8081:8081 \
- grantmacken/alpine-xqerl
-```
+In the Makefile I have an `make up` and `make down` target,
+which sets this up for you using some config vars from the .env file
 
-# Using docker-compose
-
-Perhaps the easiest way to use this image is through docker-compose.
-I have provided and example 'docker-compose.yml' and '.env' 
-which you can copy/clone and modify to use to boot your xqerl project.
-
-The docker-compose run time environment includes
-* A container name 'xq'
+The docker run time instance includes 
+* A container run name: 'xq'
+* A container hostname: 'xq'
 * Two persistent docker volumes 
-    1. A volume named 'data' which holds the database data
-    2. A volume name 'code' which holds the compiled xQuery  beam files 
-* A network named 'www' 
-* A port published on 8081
-
-In my docker-compose the running container attaches to a pre-existing 
-named network, so you will need to create that first. 
-You only need to do this once
- 
-```
-docker network create --driver=bridge wrk
-```
-
-Now to bring the container up.
-
-```
-docker-compose up -d
-```
+    1. A volume named 'data' which holds the xqerl database data
+    2. A volume name 'code' which holds the xqerl compiled xQuery  beam files 
+* joining docker network named 'wrk'
+* uses docker host environment variable `TZ` for setting local timezones
+* exposes port `8081` to the world
 
 Once the container is up running, you can issue 
 docker exec commands, like this ...
