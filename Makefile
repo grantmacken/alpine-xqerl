@@ -5,21 +5,20 @@ SHELL=/bin/bash
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 include .env
-# include inc/run.mk
-XQN=$(RUN_NAME)
-EVAL=docker exec $(RUN_NAME) xqerl eval
-
-Address = http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(RUN_NAME)):$(HOST_PORT)
-
 HEAD_SHA = $(shell curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/main | jq -Mr '.object.sha')
-THIS_SHA = $(shell grep -oP 'REPO_SHA=\K(.+)' .env)
-
+ENV_SHA = $(shell grep -oP 'REPO_SHA=\K(.+)' .env)
+ENV_OTP = $(shell grep -oP 'FROM_ERLANG=\K(.+)' .env)
+ENV_ALPINE = $(shell grep -oP 'FROM_ALPINE=\K(.+)' .env)
+README_OTP = $(shell grep -oP 'OTP \K([0-9.]+)' README.md)
+README_ALPINE = $(shell grep -oP 'alpine \K([0-9.]+)' README.md)
+DF_ALPINE = $(shell grep -oP 'FROM alpine:\K(.+)' Dockerfile)
+DF_ERLANG = $(shell grep -oP 'FROM erlang:\K([0-9.]+)' Dockerfile)
 XQERL_IMAGE := docker.pkg.github.com/$(REPO_OWNER)/$(REPO_NAME)/$(RUN_NAME):$(GHPKG_VER)
 
 .PHONY: build
 build: shell
 	@docker buildx build --output "type=image,push=false" \
-  --tag="$(REPO_OWNER)/$(REPO_NAME):$(THIS_SHA)" \
+  --tag="$(REPO_OWNER)/$(REPO_NAME):$(ENV_SHA)" \
   --tag="$(REPO_OWNER)/$(REPO_NAME):latest" \
   --tag="$(XQERL_IMAGE)" \
  .
@@ -29,6 +28,7 @@ build: shell
 clean:
 	@rm -f rebar.config
 	@#docker rmi $$(docker images -a | grep "xqerl" | awk '{print $$3}')
+
 
 .PHONY: shell
 shell: sha rebar.config
@@ -40,14 +40,17 @@ shell: sha rebar.config
 
 .PHONY: sha
 sha: rebar.config
-	@echo "previous commit sha: $(THIS_SHA)"
+	@echo "previous commit sha: $(ENV_SHA)"
 	@LATEST=$(HEAD_SHA);
 	@echo "  latest commit sha: $$LATEST";
-	if [ ! "$$LATEST" = "$(THIS_SHA)" ]; 
-	then sed -i 's/$(THIS_SHA)/$(HEAD_SHA)/' .env
+	if [ ! "$$LATEST" = "$(ENV_SHA)" ]; 
+	then sed -i 's/$(ENV_SHA)/$(HEAD_SHA)/' .env
 	fi
-	sed -i 's%$(THIS_SHA)%$(HEAD_SHA)%g' README.md
-
+	@sed -i 's%$(ENV_SHA)%$(HEAD_SHA)%g' README.md
+	@sed -i 's%$(README_OTP)%$(ENV_OTP)%g' README.md
+	@sed -i 's%$(DF_ERLANG)%$(ENV_OTP)%g' Dockerfile
+	@sed -i 's%$(README_ALPINE)%$(ENV_ALPINE)%g' README.md
+	@sed -i 's%$(DF_ALPINE)%$(ENV_ALPINE)%g' Dockerfile
 # 	% {debug_info, strip}
 
 rebar.config:
