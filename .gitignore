@@ -9,3 +9,5 @@ erl_crash.dump
 tmp
 *.config
 notes
+config
+rebar.config
