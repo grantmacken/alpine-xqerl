@@ -8,7 +8,8 @@ FROM erlang:23.2.7-alpine as shell
 LABEL maintainer="Grant MacKenzie <grantmacken@gmail.com>"
 
 WORKDIR /home
-COPY .env  rebar.config xqerl.config ./
+COPY .env rebar.config ./
+
 ENV HOME /home
 ENV LANG C.UTF-8
 ENV REBAR_BASE_DIR /home/_build
@@ -18,14 +19,12 @@ RUN  --mount=type=cache,target=/var/cache/apk \
     && apk add git \
     && source .env \
     && git clone --depth=1 --branch ${REPO_BRANCH} --progress ${REPO_URI} \
+    && sed -i "s/false/${CONFIG_ENVIRONMENT_ACCESS}/g" ./xqerl/config/xqerl.config \
     && rm ./xqerl/rebar.config \
-    && rm ./xqerl/config/xqerl.config \
-    && mv ./rebar.config ./xqerl/rebar.config \
-    && mv ./xqerl.config ./xqerl/config/xqerl.config
+    && mv ./rebar.config ./xqerl/rebar.config
 
 WORKDIR /home/xqerl
-RUN --mount=type=cache,target=/home/.cache/rebar3 \
-     rebar3 compile
+RUN --mount=type=cache,target=/home/.cache/rebar3 rebar3 compile
 
 WORKDIR /home/xqerl
 ENTRYPOINT ["rebar3", "shell"]
@@ -43,6 +42,9 @@ RUN --mount=type=cache,target=/var/cache/apk \
     && rebar3 as prod tar \
     && mkdir /usr/local/xqerl \
     && tar -zxvf ${REBAR_BASE_DIR}/prod/rel/*/*.tar.gz -C /usr/local/xqerl
+    
+
+COPY  src/bin /usr/local/xqerl/bin/scripts/
 
 FROM alpine:3.13.2
 COPY --from=prod /usr/local/xqerl /usr/local/xqerl
@@ -50,13 +52,9 @@ COPY --from=prod /usr/local/xqerl /usr/local/xqerl
 RUN  --mount=type=cache,target=/var/cache/apk \
       ln -vs /var/cache/apk /etc/apk/cache \
       && apk add --update openssl ncurses tzdata \
-      && ln -s /usr/local/xqerl/bin/xqerl /usr/local/bin/xqerl \
-      && mkdir /usr/local/xqerl/bin/scripts \
-      && mkdir /usr/local/xqerl/code/src 
+      && ln -s /usr/local/xqerl/bin/xqerl /usr/local/bin/xqerl
 
 ENV XQERL_HOME /usr/local/xqerl
-ENV XQERL_NAME xqerl@127.0.0.1
-ENV XQERL_COOKIE monster
 ENV HOME=/home
 WORKDIR ${XQERL_HOME}
 EXPOSE 8081
