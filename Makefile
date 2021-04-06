@@ -6,30 +6,32 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 include .env
 # include inc/run.mk
-XQN=$(XQERL_CONTAINER_NAME)
-EVAL=docker exec $(XQERL_CONTAINER_NAME) xqerl eval
+XQN=$(RUN_NAME)
+EVAL=docker exec $(RUN_NAME) xqerl eval
 
-Address = http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(XQERL_CONTAINER_NAME)):$(CONFIG_PORT)
+Address = http://$(shell docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(RUN_NAME)):$(HOST_PORT)
 
-HEAD_SHA != curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/main | jq -Mr '.object.sha'
-THIS_SHA != grep -oP 'REPO_SHA=\K(.+)' .env
+HEAD_SHA = $(shell curl -s https://api.github.com/repos/zadean/xqerl/git/ref/heads/main | jq -Mr '.object.sha')
+THIS_SHA = $(shell grep -oP 'REPO_SHA=\K(.+)' .env)
+
+XQERL_IMAGE := docker.pkg.github.com/$(REPO_OWNER)/$(REPO_NAME)/$(RUN_NAME):$(GHPKG_VER)
 
 .PHONY: build
 build: shell
 	@docker buildx build --output "type=image,push=false" \
   --tag="$(REPO_OWNER)/$(REPO_NAME):$(THIS_SHA)" \
   --tag="$(REPO_OWNER)/$(REPO_NAME):latest" \
-  --tag="docker.pkg.github.com/$(REPO_OWNER)/$(REPO_NAME)/$(XQERL_CONTAINER_NAME):$(GHPKG_VER)" \
+  --tag="$(XQERL_IMAGE)" \
  .
 	@echo
 
 .PHONY: clean
 clean:
-	@rm -f xqerl.config rebar.config
+	@rm -f rebar.config
 	@#docker rmi $$(docker images -a | grep "xqerl" | awk '{print $$3}')
 
 .PHONY: shell
-shell: sha xqerl.config rebar.config 
+shell: sha rebar.config
 	@docker buildx build --output "type=image,push=false" \
   --target $@ \
   --tag="$(REPO_OWNER)/$(REPO_NAME):$@" \
@@ -37,7 +39,7 @@ shell: sha xqerl.config rebar.config
 	@echo
 
 .PHONY: sha
-sha:
+sha: rebar.config
 	@echo "previous commit sha: $(THIS_SHA)"
 	@LATEST=$(HEAD_SHA);
 	@echo "  latest commit sha: $$LATEST";
@@ -46,48 +48,10 @@ sha:
 	fi
 	sed -i 's%$(THIS_SHA)%$(HEAD_SHA)%g' README.md
 
-xqerl.config:
-	@cat << EOF | tee $@
-	%% -------------------------------------------------------------------
-	%%
-	%% xqerl - XQuery processor
-	%%
-	%% Copyright (c) 2017-2020 Zachary N. Dean  All Rights Reserved.
-	%%
-	%% This file is provided to you under the Apache License,
-	%% Version 2.0 (the "License"); you may not use this file
-	%% except in compliance with the License.  You may obtain
-	%% a copy of the License at
-	%%
-	%%   http://www.apache.org/licenses/LICENSE-2.0
-	%%
-	%% Unless required by applicable law or agreed to in writing,
-	%% software distributed under the License is distributed on an
-	%% "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	%% KIND, either express or implied.  See the License for the
-	%% specific language governing permissions and limitations
-	%% under the License.
-	%%
-	%% -------------------------------------------------------------------
-	[{xqerl, [
-	   {log_file, "$(CONFIG_LOG_FILE)"},
-	   {data_dir, "$(CONFIG_DATA_DIR)"},
-	   {code_dir, "$(CONFIG_CODE_DIR)"},
-	   {port, $(CONFIG_PORT)},
-	   {trace_handler , xqerl_trace_h},
-	   {event_handlers, []},
-	   {environment_access, $(CONFIG_ENVIRONMENT_ACCESS)}
-	 ]},
-	%% Index Settings
-	 {merge_index, []},
-	 {emojipoo, [ {default_depth, 15}]}
-	].
-	EOF
-
 # 	% {debug_info, strip}
 
 rebar.config:
-	@cat << EOF | tee $@
+	@cat << EOF > $@
 	{minimum_otp_vsn, "21.2"}.
 	{deps,[
 	{xs_regex,    ".*", {git, "https://github.com/zadean/xs_regex.git",    {branch, "main"}}},
@@ -118,26 +82,62 @@ rebar.config:
 	}]
 	}.
 	{relx, [{release, {xqerl, {git, long}}, [xqerl]},
-	  {sys_config, "config/xqerl.config"},
-	  {vm_args_src,    "config/vm.args.src"},
+	  {sys_config,  "config/xqerl.config"},
+	  {vm_args_src, "config/vm.args.src"},
 	  {dev_mode, true},
 	  {include_erts, false},
 	  {extended_start_script, true},
 	  {overlay, [{mkdir, "log"},
+	    {mkdir, "data"},
+	    {mkdir, "priv"},
+	    {mkdir, "priv/static"},
+	    {mkdir, "bin/scripts"},
 	    {mkdir, "code"},
-	    {mkdir, "data"}]}
+	    {mkdir, "code/src"}]}
 	]}.
 	EOF
 
 ##################################################################
+MustHaveNetwork = docker network list --format "{{.Name}}" | \
+ grep -q $(1) || docker network create $(NETWORK) &>/dev/null
+
+MustHaveVolume = docker volume list --format "{{.Name}}" | \
+ grep -q $(1) || docker volume create --driver local --name $(1) &>/dev/null
+#
+# volume mounts
+MountCode := type=volume,target=$(XQERL_HOME)/code,source=xqerl-compiled-code
+MountData := type=volume,target=$(XQERL_HOME)/data,source=xqerl-database
 
 .PHONY: up
 up:
-	@docker-compose up -d
+	@echo '| $(@): $(XQERL_IMAGE) |'
+	@if ! docker container inspect -f '{{.State.Running}}' $(RUN_NAME) &>/dev/null
+	then 
+	@$(call MustHaveNetwork,$(NETWORK))
+	@$(call MustHaveVolume,xqerl-compiled-code)
+	@$(call MustHaveVolume,xqerl-database)
+	docker run --rm \
+	--name  $(RUN_NAME) \
+	--env "TZ=$(TZ)" \
+	--hostname $(HOST_NAME) \
+	--network $(NETWORK) \
+	--mount $(MountCode) \
+	--mount $(MountData) \
+	--publish $(HOST_PORT):8081 \
+	--detach \
+	$(XQERL_IMAGE)	
+	fi
+	@while ! docker container inspect -f '{{.State.Running}}' $(RUN_NAME) &>/dev/null
+	do
+	echo 'zzz...'
+	sleep 1 
+	done
+	@echo -n ' - $(RUN_NAME) running: ' 
+	docker container inspect -f '{{.State.Running}}' $(RUN_NAME)
 
 .PHONY: down
 down:
-	@docker-compose down
+	@docker stop $(RUN_NAME)
 
 .PHONY: network 
 network: 
