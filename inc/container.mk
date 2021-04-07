@@ -31,7 +31,7 @@ up:
 	--detach \
 	$(XQERL_IMAGE)	
 	fi
-	@while ! xq eval 'application:ensure_all_started(xqerl).' &>/dev/null
+	@while ! bin/xq eval 'application:ensure_all_started(xqerl).' &>/dev/null
 	do
 	echo ' ... '
 	sleep 1 
