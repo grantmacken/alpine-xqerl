@@ -22,7 +22,7 @@ function msg() {
 }
 
 function help() { ## show this help	 db-exists)
-  msg "Usage: xdm  ${GREEN}action${RESET} [arg]*" 
+  msg "Usage: xq  ${GREEN}action${RESET} [arg]*" 
 	cat "${BASH_SOURCE[0]}" |  
   grep -oP '[a-z-]+[)]{1}([ ]+)?[#]{2}(.+)$' |
   awk 'BEGIN {FS = ").*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $1, $2}'
@@ -83,16 +83,8 @@ function dbGetItem() {
 
 function dbList() {
   local resource="http://$(echo $1 | grep -oP '^(http://)?\K(.+)$')"
-  local res="$( 
-    docker exec xq xqerl escript bin/scripts/query.escript \
-    "('$resource' => uri-collection()) => string-join('&#10;')" 
-  )"
-  if [ -z "$(echo "$res" | grep -oP '^Error(.+)$')" ] 
-  then
-   echo "$res"
-  else
-    die "$(echo "$res" | grep -oP '^Error(.+)$')"
-  fi
+  docker exec xq xqerl escript bin/scripts/query.escript \
+    "try { ('$resource' => uri-collection()) => string-join('&#10;') } catch * {()}" 
 }
 
 function doCall() {
@@ -195,23 +187,44 @@ function dbLink() {
  echo 'TODO'
 }
 
+function doCompile() { 
+  local base="$(echo $1 | grep -oP '^(src/(main_modules|library_modules)/)?\K(.+)$')"
+  if [ -e src/main_modules/$base ] ;then  
+   docker cp src/main_modules/$base xq:/usr/local/xqerl/code/src/$base 
+  else 
+    if [ -e src/library_modules/$base ] ; then
+      docker cp src/library_modules/$base xq:/usr/local/xqerl/code/src/$base 
+    else die "[ $1 ] unknown file"
+    fi
+  fi
+  docker exec xq xqerl escript bin/scripts/compile.escript  "code/src/$base"
+}
+
+function doRun() { 
+  local base="$(echo $1 | grep -oP '^(src/main_modules/)?\K(.+)$')"
+  local srcFile="src/main_modules/$base"
+  [ -e $srcFile ] || die "[ $srcFile ] unknown file"
+  docker cp $srcFile xq:/usr/local/xqerl/code/src/$base 
+  docker exec xq xqerl escript bin/scripts/run.escript  $1 "$2"
+}
+
 case "${args[0]}" in
-    domain) ## {domain} check if domain exists in db. example: `xdm db-exists example.com` 
+    domain) ## {domain} check if domain exists in db. example: `xq db-exists example.com` 
     dbDomainExists ${args[1]}
     ;;
-  list) ## {domain/path-to-collection} list resources. example: `xdm list example.com/static-assets`
+  list) ## {domain/path} list resources. example: `xq list example.com/static-assets`
     dbList ${args[1]}
     ;;
-  #type) TODO {domain/path} get xdm type. example: `xdm item-type example.com/static-assets/icons/article.svg`
-  # dbItemType ${args[1]}
-  # ;;
-  get) ## {domain/path-to-resource} retrieve and serialize resource . example: `xdm get example.com/static-assets/icons/article.svg`
+  get) ## {domain}/{path} retrieve and serialize resource . example: `xq get example.com/static-assets/icons/article.svg`
     dbGetItem ${args[1]}
     ;;
-  put) ## {domain/path-to-file} create xdm item from file. example: `xdm create example.com`
+  put) ## {domain}/{path} create xdm item from file. example: `xq put example.com`
    dbFilePut ${args[1]}
    ;;
-  raw) ## {domain/path-to-file} move an unparsed txt file into db`
+  #type) TODO {domain}/{path} get xdm type. example: `xdm item-type example.com/static-assets/icons/article.svg`
+  # dbItemType ${args[1]}
+  # ;;
+  #put-raw) # {domain}/{path} put unparsed txt file into db`
    # dbRawTextPut ${args[1]}
    # note: there is no conversion to XDM item. 
    # note: json will remain as unparsed json unlike `put` which
@@ -221,8 +234,8 @@ case "${args[0]}" in
    # note: `$href  => unparsed-text()`
    # note: `$href  => unparsed-text-lines()`
    # note: `$href  => json-doc()`
-   ;;
- asset) ## {domain} {path} link to preprocessed binary asset` example:` xq asset example.com/icons/article.svg`
+  # ;;
+ #put-asset) # {domain}/{path} link to preprocessed binary asset` example:` xq put-asset example.com/icons/article.svg`
    # note: example:` xq asset {domain}/assets/icons/article.svg`
    # note: This is preprocessing pipeline, where the src origin is piped thru docker container instances to get a 
    # note: required processed asset result.
@@ -231,12 +244,21 @@ case "${args[0]}" in
    # note: on xqerl container the `./priv/static` dir is used.
    # in erlang `priv` - Used for application specific files
    # erlang cowboy uses `priv/static` for sering static asset files
-   ;;
- delete) ## {URI} delete resource from db. example: `xdm delete example.com/static-assets/icons/article.svg`
+  # ;;
+ delete) ## {domain}/{path} delete resource from db. example: `xq delete example.com/static-assets/icons/article.svg`
    dbDeleteItem "${args[1]}"
    ;;
- query) ## {xquery-string} run a simple xQuery. example: `xq query "current-date() => string()"`
+  # xQuery actions [ query | compile | run ] 
+  # ========================================
+  query) ## {xquery-string} run a simple xQuery. example: `xq query "current-date() => string()"`
     docker exec xq xqerl escript bin/scripts/query.escript  "${args[1]}"
+    ;;
+  compile) ## {path} xQuery module. example: `xq compile src/main_modules/put-item.xq`
+    doCompile "${args[1]}"
+    ;;
+  run) ## {main-module-name}.xq run xQuery with external arg. example: `xq run turtles.xq turtles`
+    doRun  "${args[1]}" "${args[2]}"
+
     ;;
  call) ## {module} {function} {arg} call available xqerl module functions. example: `xq call xqldb_db_server exists http://example.com
     doCall ${args[1]} ${args[2]} ${args[3]}
@@ -244,7 +266,7 @@ case "${args[0]}" in
  eval) ## {eval-string} evaluate available xqerl erlang expressions: `xdm eval 'calendar:local_time().'
     docker exec xq xqerl eval "${args[1]}"  
     ;;
- sh)  ## {cmd-string} run buzybox shell commands: `xq sh 'date -I'
+ sh)  ## {cmd-string} run alpine buzybox shell commands: `xq sh 'date -I'
       docker exec xq /bin/sh -c "${args[1]}"
       ;;
   *)
