@@ -29,7 +29,6 @@ clean:
 	@rm -f rebar.config
 	@#docker rmi $$(docker images -a | grep "xqerl" | awk '{print $$3}')
 
-
 .PHONY: shell
 shell: sha rebar.config
 	@docker buildx build --output "type=image,push=false" \

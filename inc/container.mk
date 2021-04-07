@@ -8,7 +8,7 @@ MustHaveVolume = docker volume list --format "{{.Name}}" | \
 # volume mounts
 MountCode := type=volume,target=$(XQERL_HOME)/code,source=xqerl-compiled-code
 MountData := type=volume,target=$(XQERL_HOME)/data,source=xqerl-database
-BindMount     := type=bind,target=/tmp,source=$(CURDIR)/src/data
+BindMount := type=bind,target=/tmp,source=$(CURDIR)/src/data
 
 .PHONY: up
 up:
@@ -31,6 +31,9 @@ up:
 	--detach \
 	$(XQERL_IMAGE)	
 	fi
+	@ls -al bin
+
+xxxx:
 	@while ! bin/xq eval 'application:ensure_all_started(xqerl).' &>/dev/null
 	do
 	echo ' ... '
