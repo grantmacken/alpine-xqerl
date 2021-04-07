@@ -46,7 +46,7 @@ sleep 1 && xq run turtles.xq elephants && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 sleep 3 && clear && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-echo ' - eval action [ eval ] run alpine buzybox shell commands ' && \
+echo ' - eval action [ eval ] run xqerl eval commands ' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq eval 'erlang:node().'\" && \
 sleep 1 && xq eval 'erlang:node().' && \
