@@ -12,7 +12,6 @@ function local:store($item, $uri){
 }; 
 
 try {
-
 let $argPath := ('/tmp', $arg ) => string-join('/')
 let $path := 
   if ( $argPath  => file:is-file() ) 
@@ -26,7 +25,8 @@ let $item :=
   case "svg" return $path => file:read-text()  => parse-xml()
   case "csv" return $path => file:read-text()  => csv:parse()
   case "json" return $path => fn:json-doc()
-  default return error( $dbIO, ``[ [ `{$ext}` ] can not hande extension ]``)
+  case "xml" return $path =>  file:read-text()  => parse-xml()
+  default return error( $dbIO, ``[ [ `{$ext}` ] can not handle extension ]``)
 
 let $getFuncType := function( $item as item()) as xs:string {
       if ($item instance of map(*)) then 'map'
@@ -35,7 +35,7 @@ let $getFuncType := function( $item as item()) as xs:string {
 }
 
 let $getItemType := function( $item as item() ) as xs:string {
- if ( $item instance of document-node() ) then 'node'
+ if ( $item instance of document-node() ) then 'document-node'
  else if ( $item instance of function(*) ) then $item => $getFuncType()
  else ('atomic' )
 }
@@ -46,15 +46,14 @@ let $uri :=
     case "svg" return $uriBase => concat( $ext )
     case "xml" return $uriBase => concat( $ext )
     case "json" return $uriBase => concat( $item => $getItemType())
-    default return   error( $dbIO, ``[ [ `{$ext}` ] can not hande extension ]``) 
+    default return   error( $dbIO, ``[ [ `{$ext}` ] can not handle extension ]``) 
 
 return (
 local:store($item, $uri)
 ,
 ``[ - ok: stored into db
- - item:     `{$item => $getItemType()}` 
- - location: `{$uri}` 
-]``
+ - XDM item: `{$item => $getItemType()}` 
+ - location: `{$uri}`]``
   )
 } catch * {
 ``[
