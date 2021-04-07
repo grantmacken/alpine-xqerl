@@ -25,7 +25,7 @@ src/.binned/%.escript: src/bin/%.escript
 src/.compiled/main_modules/%.xq: src/main_modules/%.xq
 	@echo '| $(notdir $@) |'
 	@docker cp $(<) xq:$(XQERL_HOME)/code/src
-	@xq compile $< 
+	@bin/xq compile $< 
 	@mkdir -p $(dir $@)
 	@cp $< $@
 	@echo
