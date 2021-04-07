@@ -7,14 +7,14 @@
  [Zachary Dean](https://github.com/zadean),
  is an Erlang XQuery 3.1 Processor and XML Database.
 
-## recent updates
+## Recent Updates
  - [x] built from [alpine 3.13.4](https://hub.docker.com/_/alpine) docker OS
  - [x] [OTP 23.3.1](https://hub.docker.com/_/erlang) latest [release](https://github.com/erlang/otp/releases)
  - [x] built from latest xqerl 
  [merge commit](https://api.github.com/repos/zadean/xqerl/git/commits/1a94833e996435495922346010ce918b4b0717f2)
  - [x] uses config values in .env file to set some xqerl.config values. This is of interest only if you wish to build the image
    yourself. In xqerl repo the  `./config/xqerl.config`, item `environment_access` is set to `false`. Our docker image
-   is built with this var set to `true`. If you want to keep the default, clone this repo and in the file `.env` set `CONFIG_ENVIRONMENT_ACCESS=true`, then run `make` to build the image.
+   is built with this var set to `true`. If you want to keep the default, clone this repo and in the file `.env` set `CONFIG_ENVIRONMENT_ACCESS=false`, then run `make` to build the image.
 
 [xqerl](https://zadean.github.io/xqerl) is in constant development, 
 so I have also tagged images with the xqerl [main](https://github.com/zadean/xqerl) git commit sha.  These tagged images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl/tags)
@@ -33,10 +33,19 @@ On [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl) I have provide
 1. interactive erlang shell: This image is a clone of xqerl repo with the entry point via `rebar3 shell` 
 2. production release: a smallish internet deploy image
 
+## Notes: working with xqerl
+
+This repo provides some helper **tools**, 
+to help with you to work with xqerl
+
+1. *Makefile* at the project root.
+2. *xq* which is a bash cli executable in the 'bin' directory. 
+3. a src directory, which is an example xqerl project layout.
+
 ## Shell: A Fat Playground Desktop Image
 
 ```
-make shell
+make run-shell
 ```
 
 This starts xqerl from ENTRYPOINT `rebar3 shell` to pop you into
@@ -73,8 +82,8 @@ Once the container is up running, you can issue
 docker exec commands, like this ...
 
 ```
-docker exec xq ./bin/xqerl eval 'application:ensure_all_started(xqerl).'
-docker exec xq ./bin/xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \")."
+docker exec xq xqerl eval 'application:ensure_all_started(xqerl).'
+docker exec xq xqerl eval "xqerl:run(\"xs:token('cats'), xs:string('dogs'), true() \")."
 ```
 
 The above is not to very useful, so to really get started the thing first things you need to check out, 
