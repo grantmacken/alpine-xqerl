@@ -2,13 +2,12 @@
 # @ref: https://adoptingerlang.org/docs/production/docker# 
 # @ref: https://github.com/grantmacken/alpine-xqerl
 #@ https://github.com/erlang/docker-erlang-otp
-# TODO automate FROM var like I do for SHA
 
 FROM erlang:23.3.1-alpine as shell
 LABEL maintainer="Grant MacKenzie <grantmacken@gmail.com>"
 
 WORKDIR /home
-COPY .env rebar.config ./
+COPY .env rebar.config  ./
 
 ENV HOME /home
 ENV LANG C.UTF-8
@@ -35,6 +34,7 @@ ENTRYPOINT ["rebar3", "shell"]
 # - dev_mode set as false
 
 FROM shell as prod
+
 RUN --mount=type=cache,target=/var/cache/apk \ 
     --mount=type=cache,target=/home/.cache/rebar3 \
     apk add --update git tar \
@@ -43,9 +43,6 @@ RUN --mount=type=cache,target=/var/cache/apk \
     && mkdir /usr/local/xqerl \
     && tar -zxvf ${REBAR_BASE_DIR}/prod/rel/*/*.tar.gz -C /usr/local/xqerl
     
-
-COPY  src/bin /usr/local/xqerl/bin/scripts/
-
 FROM alpine:3.13.4
 COPY --from=prod /usr/local/xqerl /usr/local/xqerl
 
@@ -56,8 +53,7 @@ RUN  --mount=type=cache,target=/var/cache/apk \
 
 ENV XQERL_HOME /usr/local/xqerl
 ENV HOME=/home
-WORKDIR ${XQERL_HOME}
-EXPOSE 8081
+WORKDIR /usr/local/xqerl
 STOPSIGNAL SIGQUIT
 ENTRYPOINT ["xqerl","foreground" ]
 
