@@ -39,7 +39,7 @@ up:
 	@echo -n ' - $(RUN_NAME) running: ' 
 	docker container inspect -f '{{.State.Running}}' $(RUN_NAME)
 	@echo -n ' - xqerl application all started: ' 
-	xq eval 'application:ensure_all_started(xqerl).' | grep -oP 'ok'
+	bin/xq eval 'application:ensure_all_started(xqerl).' | grep -oP 'ok'
 	@$(MAKE) --silent escripts
 	@$(MAKE) --silent main-modules
 
