@@ -12,12 +12,17 @@ jobs:
         run: |
           make shell
           make build
-      - name: Test Docker Image
+      - name: Start running xqerl
         run: |
           make up
           printf %60s | tr ' ' '-'
-          #bin/xq sh 'date -I' 
-          # bin/xq eval 'erlang:get_cookie().'
+          sleep 5
+      - name: Check xqerl
+        run: |
+          bin/xq sh 'date -I'
+          printf %60s | tr ' ' '-'
+      - name: Stop running xqerl
+        run: |
           printf %60s | tr ' ' '-'
           make down
           # - name: Dockerhub Login In and Push to dockerhub

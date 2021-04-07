@@ -33,7 +33,8 @@ up:
 	fi
 	@ls -al bin
 
-xxxx:
+.PHONY: ready
+ready:
 	@while ! bin/xq eval 'application:ensure_all_started(xqerl).' &>/dev/null
 	do
 	echo ' ... '
