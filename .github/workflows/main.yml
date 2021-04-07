@@ -11,7 +11,15 @@ jobs:
       - name: Build Docker Image From xqerl repo
         run: |
           make shell
-          make
+          make build
+      - name: Test Docker Image
+        run: |
+          make up
+          printf %60s | tr ' ' '-'
+          xq sh 'date -I' 
+          xq eval 'erlang:get_cookie().'
+          printf %60s | tr ' ' '-'
+          make down
       - name: Dockerhub Login In and Push to dockerhub
         run: |
           source .env
@@ -23,5 +31,5 @@ jobs:
         run: |
           source .env
           echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin
-          docker push docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${XQERL_CONTAINER_NAME}:${GHPKG_VER}
+          docker push docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${RUN_NAME}:${GHPKG_VER}
 
