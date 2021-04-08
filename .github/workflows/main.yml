@@ -14,7 +14,8 @@ jobs:
           make build
       - name: Start running xqerl
         run: |
-          echo '::set-env name=TERM::xterm'
+          echo 'TERM=xterm' >> $GITHUB_ENV
+          echo $TERM
           make up
           printf %60s | tr ' ' '-'
           sleep 5
