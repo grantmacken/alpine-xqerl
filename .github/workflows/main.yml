@@ -14,11 +14,9 @@ jobs:
           make build
       - name: Start running xqerl
         run: |
-          echo 'TERM=xterm' >> $GITHUB_ENV
-          echo $TERM
           make up
           printf %60s | tr ' ' '-'
-          sleep 5
+          make ready
       - name: Check xqerl
         run: |
           bin/xq sh 'date -I'

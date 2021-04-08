@@ -7,22 +7,13 @@ IFS=$'\n\t'
 declare -a args
 args=("$@")
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-YELLOW=$(tput setaf 3)
-BLUE=$(tput setaf 4)
-MAGENTA=$(tput setaf 5)
-CYAN=$(tput setaf 6)
-BLACK=$(tput setaf 0)
-WHITE=$(tput setaf 7)
-RESET=$(tput sgr0)
 
 function msg() {
   echo >&2 -e "${1-}"
 }
 
 function help() { ## show this help	 db-exists)
-  msg "Usage: xq  ${GREEN}action${RESET} [arg]*" 
+  msg "Usage: xq  action [arg]*" 
 	cat "${BASH_SOURCE[0]}" |  
   grep -oP '[a-z-]+[)]{1}([ ]+)?[#]{2}(.+)$' |
   awk 'BEGIN {FS = ").*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $1, $2}'
@@ -38,11 +29,11 @@ function cleanup() {
 }
 
 function ok (){
-  echo -n "$GREEN ✔ $RESET " && echo -n $1
+  echo -n "✔  " && echo -n $1
 }
 
 function die() {
-  local msg=$(echo -n "$RED ✘ $RESET " && echo -n $1)
+  local msg=$(echo -n "✘  " && echo -n $1)
   local code=${2-1} # default exit status 1
   msg "$msg"
   exit "$code"
