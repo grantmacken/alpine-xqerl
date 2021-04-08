@@ -31,10 +31,6 @@ up:
 	--detach \
 	$(XQERL_IMAGE)	
 	fi
-	@ls -al bin
-
-.PHONY: ready
-ready:
 	@while ! bin/xq eval 'application:ensure_all_started(xqerl).' &>/dev/null
 	do
 	echo ' ... '
