@@ -201,19 +201,22 @@ function doRun() {
 }
 
 case "${args[0]}" in
-    domain) ## {domain} check if domain exists in db. example: `xq db-exists example.com` 
-    dbDomainExists ${args[1]}
+  put) ## {domain}/{path} create xdm item from file. example: `xq put example.com/usecase/employees.xml`
+    dbFilePut ${args[1]}
     ;;
-  list) ## {domain/path} list resources. example: `xq list example.com/static-assets`
+  list) ## {domain/path} list resources. example: `xq list example.com/usecase`
     dbList ${args[1]}
     ;;
-  get) ## {domain}/{path} retrieve and serialize resource . example: `xq get example.com/static-assets/icons/article.svg`
+  get) ## {domain}/{path} retrieve and serialize resource . example: `xq get example.com/usecase/employees.xml`
     dbGetItem ${args[1]}
     ;;
-  put) ## {domain}/{path} create xdm item from file. example: `xq put example.com`
-   dbFilePut ${args[1]}
+  delete) ## {domain}/{path} delete resource from db. example: `xq delete example.com/static-assets/icons/article.svg`
+   dbDeleteItem "${args[1]}"
    ;;
-  #type) TODO {domain}/{path} get xdm type. example: `xdm item-type example.com/static-assets/icons/article.svg`
+  domain) ## {domain} check if domain exists in db. example: `xq db-exists example.com` 
+    dbDomainExists ${args[1]}
+    ;;
+  #type) TODO {domain}/{path} get xdm type. example: `xdm item-type example.com/usecase/employees.xml`
   # dbItemType ${args[1]}
   # ;;
   #put-raw) # {domain}/{path} put unparsed txt file into db`
@@ -237,9 +240,7 @@ case "${args[0]}" in
    # in erlang `priv` - Used for application specific files
    # erlang cowboy uses `priv/static` for sering static asset files
   # ;;
- delete) ## {domain}/{path} delete resource from db. example: `xq delete example.com/static-assets/icons/article.svg`
-   dbDeleteItem "${args[1]}"
-   ;;
+
   # xQuery actions [ query | compile | run ] 
   # ========================================
   query) ## {xquery-string} run a simple xQuery. example: `xq query "current-date() => string()"`
