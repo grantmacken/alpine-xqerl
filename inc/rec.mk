@@ -11,51 +11,42 @@ sleep 1 && printf %60s | tr ' ' '='  && echo && \
 echo ' - start the container ... ' && \
 make --silent up  && echo && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-sleep 3 && clear && \
-echo ' - using xq ... ' && \
-sleep 1 && printf %60s | tr ' ' '*'  && echo && \
-echo ' - list xq actions ' && \
+echo ' - xq actions ' && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq \" && \
 sleep 1 && xq && \
-sleep 3 && printf %60s | tr ' ' '='  && echo && clear && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo ' - xq CRUD database actions [ put list get delete |  ] ' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq put example.com/usecase/employees.xml \" && \
 sleep 1 && xq put example.com/usecase/employees.xml && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-sleep 3 && clear && \
 echo \"> xq list example.com/usecase \" && \
 sleep 1 && xq list example.com/usecase && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq get example.com/usecase/employees.xml \" && \
 sleep 1 && xq get example.com/usecase/employees.xml && \
-sleep 3 && printf %60s | tr ' ' '-'  && echo && clear &&\
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq delete example.com/usecase/employees.xml \" && \
 sleep 1 && xq delete example.com/usecase/employees.xml && \
-sleep 3 && printf %60s | tr ' ' '='  && echo && clear && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo ' - xQuery actions [ query | compile | run ] ' && \
 sleep 1 && printf %60s | tr ' ' '='  && echo && \
 echo \"> xq compile turtles.xq\" && \
 sleep 1 && xq compile turtles.xq && echo && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-sleep 3 && clear && \
 echo \"> xq run turtles.xq turtles\" && \
 sleep 1 && xq run turtles.xq turtles && \
 echo \"> xq run turtles.xq elephants\" && \
 sleep 1 && xq run turtles.xq elephants && \
-sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-sleep 3 && clear && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo ' - eval action [ eval ] run xqerl eval commands ' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq eval 'erlang:node().'\" && \
 sleep 1 && xq eval 'erlang:node().' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-sleep 3 && clear && \
 echo \"> xq eval 'erlang:get_cookie().'\" && \
 sleep 1 && xq eval 'erlang:get_cookie().' && \
-sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-sleep 3 && clear && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo ' - shell action [ sh ] run alpine buzybox shell commands ' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
@@ -65,7 +56,7 @@ sleep 1 && printf %60s | tr ' ' '-'  && echo"
 
 PHONY: play
 play:
-	@clear && asciinema play ../tmp/up.cast
+	@asciinema play ../tmp/up.cast
 
 .PHONY: upload
 upload:

@@ -28,10 +28,11 @@ jobs:
           bin/xq get example.com/usecase/employees.xml
           printf %60s | tr ' ' '-'
           bin/xq delete example.com/usecase/employees.xml
+          echo
           printf %60s | tr ' ' '-'
           echo ' - xQuery actions [ query | compile | run ] ' 
           printf %60s | tr ' ' '-'
-          bin/xq run 'current-date() => string()'
+          bin/xq query 'current-date() => string()'
           bin/xq compile turtles.xq
           printf %60s | tr ' ' '-'
           bin/xq run turtles.xq turtles

@@ -29,11 +29,11 @@ function cleanup() {
 }
 
 function ok (){
-  echo -n "✔  " && echo -n $1
+  echo -n "✔  " && echo  $1
 }
 
 function die() {
-  local msg=$(echo -n "✘  " && echo -n $1)
+  local msg=$(echo -n "✘  " && echo $1)
   local code=${2-1} # default exit status 1
   msg "$msg"
   exit "$code"
@@ -248,14 +248,16 @@ case "${args[0]}" in
   compile) ## {path} xQuery module. example: `xq compile src/main_modules/put-item.xq`
     doCompile "${args[1]}"
     ;;
-  run) ## {main-module-name}.xq run xQuery with external arg. example: `xq run turtles.xq turtles`
+  run) ## {name}.xq {arg} run xQuery with external arg. example: `xq run turtles.xq turtles`
+    [[ ${#args[@]} -eq 3 ]] || die 'xq run: requires 2 params {name}.xq {arg}'
     doRun  "${args[1]}" "${args[2]}"
-
     ;;
  call) ## {module} {function} {arg} call available xqerl module functions. example: `xq call xqldb_db_server exists http://example.com
+    [[ ${#args[@]} -eq 4 ]] || die 'xq call: requires 3 params {module} {function} {arg}'
     doCall ${args[1]} ${args[2]} ${args[3]}
     ;;
  eval) ## {eval-string} evaluate available xqerl erlang expressions: `xq eval 'calendar:local_time().'
+    [[ ${#args[@]} -eq 2 ]] || die 'xq eval: requires 1 params {eval-string}'
     docker exec xq xqerl eval "${args[1]}"  
     ;;
  sh)  ## {cmd-string} run alpine buzybox shell commands: `xq sh 'date -I'
