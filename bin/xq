@@ -255,7 +255,7 @@ case "${args[0]}" in
  call) ## {module} {function} {arg} call available xqerl module functions. example: `xq call xqldb_db_server exists http://example.com
     doCall ${args[1]} ${args[2]} ${args[3]}
     ;;
- eval) ## {eval-string} evaluate available xqerl erlang expressions: `xdm eval 'calendar:local_time().'
+ eval) ## {eval-string} evaluate available xqerl erlang expressions: `xq eval 'calendar:local_time().'
     docker exec xq xqerl eval "${args[1]}"  
     ;;
  sh)  ## {cmd-string} run alpine buzybox shell commands: `xq sh 'date -I'
