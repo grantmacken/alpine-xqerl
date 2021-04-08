@@ -8,6 +8,7 @@ MustHaveVolume = docker volume list --format "{{.Name}}" | \
 # volume mounts
 MountCode := type=volume,target=$(XQERL_HOME)/code,source=xqerl-compiled-code
 MountData := type=volume,target=$(XQERL_HOME)/data,source=xqerl-database
+MountAssets := type=volume,target=$(XQERL_HOME)/priv/static,source=static-assets
 BindMount := type=bind,target=/tmp,source=$(CURDIR)/src/data
 
 .PHONY: up
@@ -18,6 +19,7 @@ up:
 	@$(call MustHaveNetwork,$(NETWORK))
 	@$(call MustHaveVolume,xqerl-compiled-code)
 	@$(call MustHaveVolume,xqerl-database)
+	@$(call MustHaveVolume,static-assets)
 	docker run --rm \
 	--name  $(RUN_NAME) \
 	--env "TZ=$(TZ)" \
@@ -26,6 +28,7 @@ up:
 	--network $(NETWORK) \
 	--mount $(MountCode) \
 	--mount $(MountData) \
+  --mount $(MountAssets) \
 	--mount $(BindMount) \
 	--publish $(HOST_PORT):8081 \
 	--detach \

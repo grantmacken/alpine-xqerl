@@ -230,7 +230,7 @@ case "${args[0]}" in
    # note: `$href  => unparsed-text-lines()`
    # note: `$href  => json-doc()`
   # ;;
- #put-asset) # {domain}/{path} link to preprocessed binary asset` example:` xq put-asset example.com/icons/article.svg`
+ put-asset) ## {domain}/{path} link to preprocessed binary asset` example:` xq put-asset example.com/icons/article.svg`
    # note: example:` xq asset {domain}/assets/icons/article.svg`
    # note: This is preprocessing pipeline, where the src origin is piped thru docker container instances to get a 
    # note: required processed asset result.
@@ -239,7 +239,7 @@ case "${args[0]}" in
    # note: on xqerl container the `./priv/static` dir is used.
    # in erlang `priv` - Used for application specific files
    # erlang cowboy uses `priv/static` for sering static asset files
-  # ;;
+  ;;
 
   # xQuery actions [ query | compile | run ] 
   # ========================================
