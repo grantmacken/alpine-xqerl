@@ -15,41 +15,42 @@ jobs:
       - name: Start running xqerl
         run: |
           make up
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
       - name: xq commands check
         run: |
           bin/xq
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
           echo ' - xq CRUD database actions [ put list get delete |  ] '
           bin/xq put example.com/usecase/employees.xml
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
           bin/xq list example.com/usecase
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
           bin/xq get example.com/usecase/employees.xml
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
           bin/xq delete example.com/usecase/employees.xml
-          echo
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
           echo ' - xQuery actions [ query | compile | run ] ' 
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
           bin/xq query 'current-date() => string()'
+          printf %60s | tr ' ' '-' && echo
           bin/xq compile turtles.xq
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
           bin/xq run turtles.xq turtles
-          printf %60s | tr ' ' '-'
+          bin/xq run turtles.xq elephants
+          printf %60s | tr ' ' '-' && echo
           echo ' - xqerl application actions [ call | eval ] run available xqerl erlang expressions' 
           bin/xq call xqldb_db_server exists http://example.com
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
           bin/xq eval 'calendar:local_time().'
-          printf %60s | tr ' ' '-'
-          bin/echo ' - shell actions [ sh ] run alpine buzybox shell commands ' 
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
+          echo ' - shell actions [ sh ] run alpine buzybox shell commands ' 
+          printf %60s | tr ' ' '-' && echo
           bin/xq  sh 'date -I'
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
       - name: Stop running xqerl
         run: |
           make down
-          printf %60s | tr ' ' '-'
+          printf %60s | tr ' ' '-' && echo
       - name: Dockerhub Login In and Push to dockerhub
         run: |
           source .env
