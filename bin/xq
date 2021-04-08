@@ -157,6 +157,7 @@ function dbDeleteItem() {
   if "$( isDocAvailable $resource )"
   then
     docker exec xq xqerl escript bin/scripts/query.escript  "'$resource' => db:delete()"
+    ok "resource deleted from db: [ $resource ]"
   else 
     local collection=$(dirname $resource)
     if [ -n "$(dbList $collection | grep -oP "^${resource}$")" ]

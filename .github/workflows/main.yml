@@ -16,10 +16,34 @@ jobs:
         run: |
           make up
           printf %60s | tr ' ' '-'
-          make ready
-      - name: Check xqerl
+      - name: Check: run xq commands
         run: |
-          bin/xq sh 'date -I'
+          xq
+          printf %60s | tr ' ' '-'
+          echo ' - xq CRUD database actions [ put list get delete |  ] '
+          xq put example.com/usecase/employees.xml
+          printf %60s | tr ' ' '-'
+          xq list example.com/usecase
+          printf %60s | tr ' ' '-'
+          xq get example.com/usecase/employees.xml
+          printf %60s | tr ' ' '-'
+          xq delete example.com/usecase/employees.xml
+          printf %60s | tr ' ' '-'
+          echo ' - xQuery actions [ query | compile | run ] ' 
+          printf %60s | tr ' ' '-'
+          xq run "current-date() => string()"
+          xq compile turtles.xq
+          printf %60s | tr ' ' '-'
+          xq run turtles.xq turtles
+          printf %60s | tr ' ' '-'
+          echo ' - xqerl application actions [ call | eval ] run available xqerl erlang expressions' 
+          xq call xqldb_db_server exists http://example.com
+          printf %60s | tr ' ' '-'
+          xq eval 'calendar:local_time().'
+          printf %60s | tr ' ' '-'
+          echo ' - shell actions [ sh ] run alpine buzybox shell commands ' 
+          printf %60s | tr ' ' '-'
+          xq  sh 'date -I'
           printf %60s | tr ' ' '-'
       - name: Stop running xqerl
         run: |
