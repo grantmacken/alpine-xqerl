@@ -51,7 +51,7 @@ jobs:
           echo '>  bin/xq eval "calendar:local_time()."'
           bin/xq eval 'calendar:local_time().'
           printf %60s | tr ' ' '-' && echo
-          echo ' - shell actions [ sh ] run alpine buzybox shell commands ' 
+          echo ' - shell actions [ sh ] run alpine busybox shell commands ' 
           printf %60s | tr ' ' '-' && echo
           echo ">  bin/xq  sh 'date -I'"
           bin/xq  sh 'date -I'

@@ -260,7 +260,7 @@ case "${args[0]}" in
     [[ ${#args[@]} -eq 2 ]] || die 'xq eval: requires 1 params {eval-string}'
     docker exec xq xqerl eval "${args[1]}"  
     ;;
- sh)  ## {cmd-string} run alpine buzybox shell commands: `xq sh 'date -I'
+ sh)  ## {cmd-string} run alpine busybox shell commands: `xq sh 'date -I'
       docker exec xq /bin/sh -c "${args[1]}"
       ;;
   *)

@@ -4,7 +4,7 @@ rec:
 	@mkdir -p ../tmp
 	@asciinema rec ../tmp/up.cast \
  --overwrite \
- --title='grantmacken/alpine-xqerl ran `make up'\
+ --title='grantmacken/xq - a cli for xqerl'\
  --idle-time-limit 1 \
  --command="\
 sleep 1 && printf %60s | tr ' ' '='  && echo && \
@@ -40,7 +40,12 @@ sleep 1 && xq run turtles.xq turtles && \
 echo \"> xq run turtles.xq elephants\" && \
 sleep 1 && xq run turtles.xq elephants && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-echo ' - eval action [ eval ] run xqerl eval commands ' && \
+echo ' - application [ call | eval ] run xqerl application expressions' && \
+echo \"> xq call xqldb_db_server exists http://example.com\" && \
+sleep 1 && xq call xqldb_db_server exists http://example.com && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+echo \"> xq eval 'erlang:node().'\" && \
+sleep 1 && xq eval 'erlang:node().' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq eval 'erlang:node().'\" && \
 sleep 1 && xq eval 'erlang:node().' && \
@@ -48,7 +53,7 @@ sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq eval 'erlang:get_cookie().'\" && \
 sleep 1 && xq eval 'erlang:get_cookie().' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-echo ' - shell action [ sh ] run alpine buzybox shell commands ' && \
+echo ' - shell action [ sh ] run alpine busybox shell commands ' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq sh 'date -I'\" && \
 sleep 1 && xq sh 'date -I' && \
@@ -60,7 +65,7 @@ play:
 
 .PHONY: upload
 upload:
-	asciinema upload ../tmp/csv.cast
+	asciinema upload ../tmp/up.cast
 
 
 check-can-run-expression:
