@@ -21,30 +21,39 @@ jobs:
           bin/xq
           printf %60s | tr ' ' '-' && echo
           echo ' - xq CRUD database actions [ put list get delete |  ] '
+          echo '> bin/xq put example.com/usecase/employees.xml'
           bin/xq put example.com/usecase/employees.xml
           printf %60s | tr ' ' '-' && echo
+          echo '> bin/xq list example.com/usecase'
           bin/xq list example.com/usecase
           printf %60s | tr ' ' '-' && echo
+          echo '> bin/xq get example.com/usecase/employees.xml'
           bin/xq get example.com/usecase/employees.xml
           printf %60s | tr ' ' '-' && echo
+          echo '> bin/xq delete example.com/usecase/employees.xml'
           bin/xq delete example.com/usecase/employees.xml
           printf %60s | tr ' ' '-' && echo
           echo ' - xQuery actions [ query | compile | run ] ' 
           printf %60s | tr ' ' '-' && echo
+          echo "> bin/xq query 'current-date() => string()'"
           bin/xq query 'current-date() => string()'
           printf %60s | tr ' ' '-' && echo
+          echo '> bin/xq compile turtles.xq'
           bin/xq compile turtles.xq
           printf %60s | tr ' ' '-' && echo
-          bin/xq run turtles.xq turtles
+          echo '> bin/xq run turtles.xq turtles'
           bin/xq run turtles.xq elephants
           printf %60s | tr ' ' '-' && echo
           echo ' - xqerl application actions [ call | eval ] run available xqerl erlang expressions' 
+          echo '> bin/xq call xqldb_db_server exists http://example.com'
           bin/xq call xqldb_db_server exists http://example.com
           printf %60s | tr ' ' '-' && echo
+          echo '>  bin/xq eval "calendar:local_time()."'
           bin/xq eval 'calendar:local_time().'
           printf %60s | tr ' ' '-' && echo
           echo ' - shell actions [ sh ] run alpine buzybox shell commands ' 
           printf %60s | tr ' ' '-' && echo
+          echo ">  bin/xq  sh 'date -I'"
           bin/xq  sh 'date -I'
           printf %60s | tr ' ' '-' && echo
       - name: Stop running xqerl
