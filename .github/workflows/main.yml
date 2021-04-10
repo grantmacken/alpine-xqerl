@@ -82,14 +82,14 @@ jobs:
           printf %60s | tr ' ' '=' && echo
           echo ' - xQuery actions [ query | compile | run ] ' 
           printf %60s | tr ' ' '-' && echo
-          echo ' - `xq query {expression}` runs a xQuery expression in xqerl'
-          echo ' - the expression limation is that the expression should return a string item'
+          echo ' `xq query {expression}` runs a xQuery expression in xqerl'
+          echo ' the expression limation is that the expression should return a string item'
           echo "> bin/xq query 'current-date() => string()'"
           bin/xq query 'current-date() => string()'
-          printf %60s | tr ' ' '-' && echo
-          echo '- main module *compile* sources are located in the "./src/main_modules/" directory'
-          echo '- library module *compile* sources are located in the "./src/library_modules/" directory'
-          echo ' - `xq compile {filename}` compiles xQuery files so they run on the beam'
+          printf %60s | tr ' ' '-' && echo ''
+          echo '  main module *compile* sources are located in the "./src/main_modules/" directory'
+          echo '  library module *compile* sources are located in the "./src/library_modules/" directory'
+          echo ' `xq compile {filename}` compiles xQuery files so they run on the beam'
           echo '> bin/xq compile put-item.xq'
           bin/xq compile put-item.xq
           echo && printf %60s | tr ' ' '-' && echo
