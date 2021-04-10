@@ -25,8 +25,7 @@ jobs:
       - name: xq commands check
         run: |
           echo ' - init make sure HOME bin on exec PATH and symlink to project bin'
-          bin/xq init
-          xq
+          echo $PATH
       - name: Stop running xqerl
         run: |
           make down
