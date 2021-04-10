@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+shopt -s extglob;
 IFS=$'\n\t'
+source .env
+XQERL_IMAGE=docker.pkg.github.com/$REPO_OWNER/$REPO_NAME/$RUN_NAME:$GHPKG_VER
+MountAssets="type=volume,target=$XQERL_HOME/priv/static/assets,source=static-assets"
 #trap cleanup SIGINT SIGTERM ERR EXIT
 # https://github.com/lhunath/scripts/blob/66c734c96ff745b43daf89ddc81cdbcded881df7/bashlib/bashlib
 # source .version.env
 declare -a args
+
 args=("$@")
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
@@ -17,16 +22,10 @@ function help() { ## show this help	 db-exists)
 	cat "${BASH_SOURCE[0]}" |  
   grep -oP '[a-z-]+[)]{1}([ ]+)?[#]{2}(.+)$' |
   awk 'BEGIN {FS = ").*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $1, $2}'
-  exit
 }
 
 # check required arguments
-[[ ${#args[@]} -eq 0 ]] && help
-
-function cleanup() {
-  trap - SIGINT SIGTERM ERR EXIT
-  # script cleanup here
-}
+[[ ${#args[@]} -eq 0 ]] && help && exit
 
 function ok (){
   echo -n "✔  " && echo  $1
@@ -48,9 +47,21 @@ function dbDomainExists() {
 
 function dbItemType() {
   docker exec xq xqerl escript bin/scripts/run.escript \
-    db-item-type.xq \
-    $1
+    db-item-type.xq $1
   }
+
+function dbGetLink() {
+  local local resource="http://$(echo $1 | grep -oP '^(http://)?\K(.+)$')"
+  local collection=$(dirname $resource)
+  if [ -n "$(dbList $collection | grep -oP "^${resource}$")" ]
+    then
+    #docker exec xq xqerl escript bin/scripts/query.escript  "'$resource' => db:delete()" &>/dev/null
+    ok "resource in db: [ $resource ]"
+    docker exec xq xqerl escript bin/scripts/query.escript  "'$resource' => db:get()" 
+  else
+    die "resource NOT found in db: [ $resource ]"
+  fi
+}
 
 function dbGetItem() {
   local resource="http://$(echo $1 | grep -oP '^(http://)?\K(.+)$')"
@@ -73,9 +84,9 @@ function dbGetItem() {
 }
 
 function dbList() {
-  local resource="http://$(echo $1 | grep -oP '^(http://)?\K(.+)$')"
+  local path="http://$(echo $1 | grep -oP '^(http://)?\K(.+)$')"
   docker exec xq xqerl escript bin/scripts/query.escript \
-    "try { ('$resource' => uri-collection()) => string-join('&#10;') } catch * {()}" 
+    "try { ('$path' => uri-collection()) => string-join('&#10;') } catch * {()}" 
 }
 
 function doCall() {
@@ -87,6 +98,23 @@ function isDocAvailable() {
   docker exec xq xqerl escript bin/scripts/query.escript \
   "'$1' => doc-available() => string()"
 }
+
+function isAvailable() {
+  local resource="http://$(echo $1 | grep -oP '^(http://)?\K(.+)$')"
+  docker exec xq xqerl escript bin/scripts/query.escript \
+    "( '$resource' = ( remove( \
+        '$resource' => \
+        tokenize('/'),'$1' => \
+        tokenize('/') => \
+        count()\
+        )\
+      ) => \
+      string-join('/')  => \
+      string() => \
+      uri-collection()\
+    ) => string()"
+}
+
 
 function getDoc() {
   docker exec xq xqerl escript bin/scripts/query.escript \
@@ -100,56 +128,36 @@ function dbFilePut() {
   local xqFile="/tmp/$base"
   docker exec xq ls -al $xqFile &>/dev/null || die "[ $xqFile ] not in running instance, check bind mount"
   local filename=$(basename -- "$srcFile")
-  local extension="${filename##*.}"
+  local ext="${filename##*.}"
   #local filename="${filename%.*}"
   # echo $1 | grep -oP '/data/' &>/dev/null || die "[ ${args[1]} ] unknown directory"
   #local target="${1##*/data/}" 
-  case "$extension" in
-    svg)
-    docker exec xq xqerl escript bin/scripts/run.escript \
-      put-item.xq \
-      $base
-      ;; 
-    xml)
-    docker exec xq xqerl escript bin/scripts/run.escript \
-      put-item.xq \
-      $base
-      ;; 
-    json)
+  if echo ${ext} | grep -oP '^(xml|json|csv)$' &>/dev/null
+    then  
+      docker exec xq xqerl escript bin/scripts/run.escript put-item.xq $base
+  elif echo ${ext} | grep -oP '^(md)$' &>/dev/null
+    then
+      echo "TODO"
+      #local target="${1##*/data/}"
+      #local dir=$(dirname $target)
+      #local domain=${dir%%/*}
+      #local path=${dir##*/}
+      #local baseName=$(basename  "$1")
+      #local ext="${baseName##*.}"
+      #local resource="${baseName%.*}"
       # json stored as XDM map or array
-      docker exec xq xqerl escript bin/scripts/run.escript \
-      put-item.xq \
-      $1
-      ;;
-     csv)
-      # json stored as XDM map or array
-      docker exec xq xqerl escript bin/scripts/run.escript \
-      put-item.xq \
-      $1
-      ;;
-   md)
-      local target="${1##*/data/}"
-      local dir=$(dirname $target)
-      local domain=${dir%%/*}
-      local path=${dir##*/}
-      local baseName=$(basename  "$1")
-      local ext="${baseName##*.}"
-      local resource="${baseName%.*}"
-      # json stored as XDM map or array
-      local Uri="http://${domain}/${path}/${resource}" 
-      local srcFile=src/data/${domain}/${path}/${resource}.xml
-      local xqFile=/tmp/${domain}/${path}/${resource}.xml
-      cat $1 | \
-      docker run --rm  --interactive \
-      docker.pkg.github.com/grantmacken/alpine-cmark/cmark:$CMARK_VER \
-      --to xml | \
-      sed -e '1,2d' > $srcFile
-      docker exec xq xqerl escript bin/scripts/insert-doc.escript $Uri $xqFile
-      rm -f $srcFile
-      ;;
-  *)
-    die "[ ${args[1]} ] unknown extension"
-esac
+      #local Uri="http://${domain}/${path}/${resource}" 
+      #local srcFile=src/data/${domain}/${path}/${resource}.xml
+      #local xqFile=/tmp/${domain}/${path}/${resource}.xml
+      #cat $1 | \
+      #docker run --rm  --interactive \
+      #docker.pkg.github.com/grantmacken/alpine-cmark/cmark:$CMARK_VER \
+      #--to xml | \
+      #sed -e '1,2d' > $srcFile
+      #docker exec xq xqerl escript bin/scripts/insert-doc.escript $Uri $xqFile
+      #rm -f $srcFile
+  else die "can not handle extension [ $ext ]"
+  fi
 }
 
 function dbDeleteItem() {
@@ -159,8 +167,7 @@ function dbDeleteItem() {
     docker exec xq xqerl escript bin/scripts/query.escript  "'$resource' => db:delete()"
     ok "resource deleted from db: [ $resource ]"
   else 
-    local collection=$(dirname $resource)
-    if [ -n "$(dbList $collection | grep -oP "^${resource}$")" ]
+    if isAvailable $resource
       then
       docker exec xq xqerl escript bin/scripts/query.escript  "'$resource' => db:delete()" &>/dev/null
       ok "resource deleted from db: [ $resource ]"
@@ -171,11 +178,6 @@ function dbDeleteItem() {
 }
 
 function dbDeleteCollection() { 
- echo 'TODO'
-}
-
-function dbLink() { 
-  #xqerl_update:add(Ctx, {put, link, Filename, DB, Name}).
  echo 'TODO'
 }
 
@@ -200,6 +202,40 @@ function doRun() {
   docker exec xq xqerl escript bin/scripts/run.escript  $1 "$2"
 }
 
+#xqerl_update:add(Ctx, {put, link, Filename, DB, Name}).
+
+function dbLink() {
+  local domain=$1
+  local base="$(echo $2 | grep -oP '^(src/static_assets/)?\K(.+)$')"
+  local srcFile="src/static_assets/$base"
+  [ -e $srcFile ] || die "[ $srcFile ] unknown file"
+  local basename=$(basename -- "$base")
+  local dirname=$(dirname -- "$base")
+  local ext="${basename##*.}"
+  local resource="${basename%.*}"
+  case "$ext" in
+    svg)
+    local filename="$XQERL_HOME/priv/static/assets/$dirname/$resource.svgz"
+    local uri="http://$domain/$dirname/$resource.svgz"
+    docker run --rm --interactive --mount $MountAssets --entrypoint "sh" $XQERL_IMAGE \
+    -c "mkdir -p priv/static/$dirname"
+    cat $srcFile | \
+    docker run --rm --interactive docker.pkg.github.com/grantmacken/alpine-scour/scour:0.0.2 | \
+    docker run --rm --interactive docker.pkg.github.com/grantmacken/alpine-zopfli/zopfli:0.0.1 | \
+    docker run --rm --interactive --mount $MountAssets --entrypoint "sh" $XQERL_IMAGE \
+    -c "cat - > $filename"
+    docker exec xq xqerl escript bin/scripts/query.escript  "db:link('$filename','$uri')" &>/dev/null
+    echo -n ' - stored in static-assets volume: '
+    docker run --rm --interactive --mount $MountAssets --entrypoint "sh" $XQERL_IMAGE \
+      -c "ls $filename"
+    echo -n ' - db link to asset: '
+    xq list http://$domain/$dirname | grep -oP "http://$domain/$dirname/$resource.svgz"
+    ;;
+  *)
+    die "[ $assetType ] unknown asset type "
+  esac
+}
+
 case "${args[0]}" in
   put) ## {domain}/{path} create xdm item from file. example: `xq put example.com/usecase/employees.xml`
     dbFilePut ${args[1]}
@@ -207,15 +243,27 @@ case "${args[0]}" in
   list) ## {domain/path} list resources. example: `xq list example.com/usecase`
     dbList ${args[1]}
     ;;
+  available) ## {domain/path} list resources. example: `xq list example.com/usecase`
+    isAvailable "${args[1]}"
+    ;;
   get) ## {domain}/{path} retrieve and serialize resource . example: `xq get example.com/usecase/employees.xml`
-    dbGetItem ${args[1]}
+   res="${args[1]}"
+   base=$(basename -- "$res")
+   ext="${base##*.}"
+  #  local regItem="^(xml|array|map)$"
+  if echo ${ext} | grep -oP '^(svgz)$' &>/dev/null
+    then dbGetLink ${res}
+  elif echo ${ext} | grep -oP '^(xml|array|map)$' &>/dev/null
+    then dbGetItem ${res}
+  else die "can not handle extension [ $ext ]"
+  fi
     ;;
   delete) ## {domain}/{path} delete resource from db. example: `xq delete example.com/static-assets/icons/article.svg`
    dbDeleteItem "${args[1]}"
    ;;
-  domain) ## {domain} check if domain exists in db. example: `xq db-exists example.com` 
-    dbDomainExists ${args[1]}
-    ;;
+  #domain) ## {domain} check if domain exists in db. example: `xq db-exists example.com` 
+  #  dbDomainExists ${args[1]}
+  # ;;
   #type) TODO {domain}/{path} get xdm type. example: `xdm item-type example.com/usecase/employees.xml`
   # dbItemType ${args[1]}
   # ;;
@@ -230,17 +278,10 @@ case "${args[0]}" in
    # note: `$href  => unparsed-text-lines()`
    # note: `$href  => json-doc()`
   # ;;
- put-asset) ## {domain}/{path} link to preprocessed binary asset` example:` xq put-asset example.com/icons/article.svg`
-   # note: example:` xq asset {domain}/assets/icons/article.svg`
-   # note: This is preprocessing pipeline, where the src origin is piped thru docker container instances to get a 
-   # note: required processed asset result.
-   # note. This asset result is stored in docker **static-assets** volume,
-   # note: and a db link is created in the db to the asset item.
-   # note: on xqerl container the `./priv/static` dir is used.
-   # in erlang `priv` - Used for application specific files
-   # erlang cowboy uses `priv/static` for sering static asset files
+  link) ## {domain} {asset-path} link to preprocessed binary asset` example:` xq link example.com icons/article.svg`
+  [[ ${#args[@]} -eq 3 ]] || die 'xq eval: requires 2 params {domain} {path}'
+  dbLink "${args[1]}" "${args[2]}"
   ;;
-
   # xQuery actions [ query | compile | run ] 
   # ========================================
   query) ## {xquery-string} run a simple xQuery. example: `xq query "current-date() => string()"`
@@ -254,6 +295,7 @@ case "${args[0]}" in
     doRun  "${args[1]}" "${args[2]}"
     ;;
  call) ## {module} {function} {arg} call available xqerl module functions. example: `xq call xqldb_db_server exists http://example.com
+   # xq call cowboy detect_mimetype /usr/local/xqerl/priv/static/icons/article.svgz
     [[ ${#args[@]} -eq 4 ]] || die 'xq call: requires 3 params {module} {function} {arg}'
     doCall ${args[1]} ${args[2]} ${args[3]}
     ;;
@@ -265,7 +307,8 @@ case "${args[0]}" in
       docker exec xq /bin/sh -c "${args[1]}"
       ;;
   *)
-    die "[ ${args[0]} ] unknown verb - try [ list ]"
+    help
+    die 'unknown action try one of the above actions'
 esac
 
 

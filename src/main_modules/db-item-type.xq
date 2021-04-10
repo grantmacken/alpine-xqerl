@@ -92,7 +92,7 @@ return $arg => db:get()  => $itemType()
 
 } catch * {
 ``[
-  ERROR!
+  ERROR! 
   module: `{$err:module}`
   line number: `{$err:line-number}`
  `{$err:code}`: `{$err:description}`

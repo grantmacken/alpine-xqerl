@@ -16,35 +16,78 @@ jobs:
         run: |
           make up
           printf %60s | tr ' ' '-' && echo
+      - name: Github login in and pull helper github packages
+        run: |
+          source .env
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin &>/dev/null
+          docker pull docker.pkg.github.com/grantmacken/alpine-scour/scour:0.0.2
+          docker pull docker.pkg.github.com/grantmacken/alpine-zopfli/zopfli:0.0.1
       - name: xq commands check
         run: |
           bin/xq
           printf %60s | tr ' ' '-' && echo
-          echo ' - xq CRUD database actions [ put list get delete |  ] '
+          echo ' - xq CRUD database actions [ put list available get delete link  ] '
+          printf %60s | tr ' ' '=' && echo
+          echo ' - all *data* sources are located in the "./src/data/" directory'
+          echo ' - *data* soruce starts with a {domain}. the {domain} is '
+          echo ' - `xq put {data-path}` will store a data source as a db XDM item'
           echo '> bin/xq put example.com/usecase/employees.xml'
           bin/xq put example.com/usecase/employees.xml
+          echo '> bin/xq put example.com/usecase/colors.json'
+          bin/xq put example.com/usecase/colors.json
+          echo '> bin/xq put example.com/usecase/mildred.json'
+          bin/xq put example.com/usecase/mildred.json
           printf %60s | tr ' ' '-' && echo
+          echo ' - `xq link {domain} {path}` will store db link to static asset files'
+          echo '> bin/xq link example.com icons/article.svg'
+          bin/xq link example.com icons/article.svg
+          echo '> bin/xq link example.com icons/article.svg'
+          bin/xq link example.com icons/article.svg
+          echo '> bin/xq link example.com icons/note.svg'
+          bin/xq link example.com icons/note.svg
+          printf %60s | tr ' ' '-' && echo
+          echo ' - `xq list {db-path}` lists db resources, including links'
           echo '> bin/xq list example.com/usecase'
           bin/xq list example.com/usecase
+          echo '> bin/xq list example.com/icons'
+          bin/xq list example.com/icons
           printf %60s | tr ' ' '-' && echo
+          echo ' - `xq available {db-path}` returns true or false'
+          echo '> bin/xq available example.com/usecase/colors.array'
+          bin/xq available example.com/usecase/colors.json
+          echo '> bin/xq available example.com/usecase/nothing.array'
+          bin/xq available example.com/usecase/nothing.json
+          printf %60s | tr ' ' '-' && echo
+          echo ' - `xq get {db-path}` returns a serialized XDM item'
+          echo ' - array and map XDM items will be serialized as JSON strings'
+          echo ' - document-node XDM items will be serialized as XML strings'
           echo '> bin/xq get example.com/usecase/employees.xml'
           bin/xq get example.com/usecase/employees.xml
+          echo '> bin/xq get example.com/usecase/employees.xml'
+          bin/xq get example.com/usecase/colors.array
+          echo '> bin/xq get example.com/usecase/colors.array'
           printf %60s | tr ' ' '-' && echo
+          echo ' - `xq delete {db-path}` deletes a XDM item from the db'
           echo '> bin/xq delete example.com/usecase/employees.xml'
           bin/xq delete example.com/usecase/employees.xml
-          printf %60s | tr ' ' '-' && echo
+          printf %60s | tr ' ' '=' && echo
           echo ' - xQuery actions [ query | compile | run ] ' 
           printf %60s | tr ' ' '-' && echo
+          echo ' - `xq query {expression}` runs a xQuery expression in xqerl'
+          echo ' - the expression limation is that the expression should return a string item'
           echo "> bin/xq query 'current-date() => string()'"
           bin/xq query 'current-date() => string()'
           printf %60s | tr ' ' '-' && echo
-          echo '> bin/xq compile turtles.xq'
-          bin/xq compile turtles.xq
+          echo ' - `xq compile {filename}` compiles xQuery files so they run on the beam'
+          echo '> bin/xq compile put-item.xq'
+          bin/xq compile put-item.xq
           printf %60s | tr ' ' '-' && echo
+          echo ' - `xq run {filename} {argument}` runs compiled xQuerys with a external argumnent'
+          echo '> bin/xq run turtles.xq turtles'
+          bin/xq run turtles.xq turtles
           echo '> bin/xq run turtles.xq turtles'
           bin/xq run turtles.xq elephants
           printf %60s | tr ' ' '-' && echo
-          echo ' - xqerl application actions [ call | eval ] run available xqerl erlang expressions' 
           echo '> bin/xq call xqldb_db_server exists http://example.com'
           bin/xq call xqldb_db_server exists http://example.com
           printf %60s | tr ' ' '-' && echo
@@ -60,15 +103,3 @@ jobs:
         run: |
           make down
           printf %60s | tr ' ' '-' && echo
-      - name: Dockerhub Login In and Push to dockerhub
-        run: |
-          source .env
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io --username ${REPO_OWNER} --password-stdin 
-          docker push ${REPO_OWNER}/${REPO_NAME}:shell
-          docker push ${REPO_OWNER}/${REPO_NAME}:latest
-          docker push ${REPO_OWNER}/${REPO_NAME}:${REPO_SHA}
-      - name: Github Login In and Push to Github Packages
-        run: |
-          source .env
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin
-          docker push docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${RUN_NAME}:${GHPKG_VER}

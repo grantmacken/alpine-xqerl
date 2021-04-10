@@ -8,11 +8,11 @@ MustHaveVolume = docker volume list --format "{{.Name}}" | \
 # volume mounts
 MountCode := type=volume,target=$(XQERL_HOME)/code,source=xqerl-compiled-code
 MountData := type=volume,target=$(XQERL_HOME)/data,source=xqerl-database
-MountAssets := type=volume,target=$(XQERL_HOME)/priv/static,source=static-assets
+MountAssets := type=volume,target=$(XQERL_HOME)/priv/static/assets,source=static-assets
 BindMount := type=bind,target=/tmp,source=$(CURDIR)/src/data
 
 .PHONY: up
-up:
+up: clean
 	@echo '| $(@): $(XQERL_IMAGE) |'
 	@if ! docker container inspect -f '{{.State.Running}}' $(RUN_NAME) &>/dev/null
 	then 

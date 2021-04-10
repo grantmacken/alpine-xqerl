@@ -16,12 +16,6 @@ build: shell
  .
 	@echo
 
-.PHONY: clean
-clean:
-	@rm -f rebar.config
-	@rm -f $(Escripts)
-	@#docker rmi $$(docker images -a | grep "xqerl" | awk '{print $$3}')
-
 .PHONY: shell
 shell: sha rebar.config
 	@docker buildx build --output "type=image,push=false" \
