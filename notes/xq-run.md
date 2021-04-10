@@ -1,4 +1,4 @@
-`xq run {filename} {argument}` runs compiled xQuery with a external argument'
+`xq run {filename} {argument}` runs compiled xQuery with a single external argument'
 
 ```
 xq run turtles.xq turtles

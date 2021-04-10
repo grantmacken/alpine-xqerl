@@ -1,25 +1,28 @@
 
-.PHONY: rec
-rec:
+.PHONY: rec-xq
+rec-xq:
 	@mkdir -p ../tmp
-	@asciinema rec ../tmp/up.cast \
+	@asciinema rec ../tmp/$(@).cast \
  --overwrite \
- --title='grantmacken/xq - a cli for xqerl'\
+ --title='xq - a cli for xqerl'\
  --idle-time-limit 1 \
  --command="\
-sleep 1 && printf %60s | tr ' ' '='  && echo && \
-echo ' - start the container ... ' && \
-make --silent up  && echo && \
-sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo ' - xq actions ' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq \" && \
 sleep 1 && xq && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-echo ' - xq CRUD database actions [ put list get delete |  ] ' && \
+echo ' - xq database actions [ put link list available get delete ] ' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-echo \"> xq put example.com/usecase/employees.xml \" && \
+sleep 1 && echo ' - all *data* sources are located in the \"./src/data/\" directory' && \
+sleep 1 && echo ' - `xq put {data-path}` will store a data source as a db XDM item' && \
+echo '> xq put example.com/usecase/employees.xml' && \
 sleep 1 && xq put example.com/usecase/employees.xml && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+sleep 1 && echo '> bin/xq put example.com/usecase/colors.json' && \
+sleep 1 && bin/xq put example.com/usecase/colors.json && \
+sleep 1 && echo '> bin/xq put example.com/usecase/mildred.json' && \
+sleep 1 && bin/xq put example.com/usecase/mildred.json  && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq list example.com/usecase \" && \
 sleep 1 && xq list example.com/usecase && \
@@ -29,7 +32,18 @@ sleep 1 && xq get example.com/usecase/employees.xml && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq delete example.com/usecase/employees.xml \" && \
 sleep 1 && xq delete example.com/usecase/employees.xml && \
-sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo"
+	@cat ../tmp/$(@).cast | svg-term > ../tmp/$(@).svg
+	@firefox --new-tab ../tmp/$(@).svg
+
+.PHONY: rec-xq-xquery
+rec-xq-query:
+	@mkdir -p ../tmp
+	@asciinema rec ../tmp/$(@).cast \
+ --overwrite \
+ --title='xq - a cli for xqerl'\
+ --idle-time-limit 1 \
+ --command="\
 echo ' - xQuery actions [ query | compile | run ] ' && \
 sleep 1 && printf %60s | tr ' ' '='  && echo && \
 echo \"> xq compile turtles.xq\" && \
@@ -58,6 +72,34 @@ sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq sh 'date -I'\" && \
 sleep 1 && xq sh 'date -I' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo"
+
+
+.PHONY: rec-up
+rec-up:
+	@mkdir -p ../tmp
+	@asciinema rec ../tmp/$(@).cast \
+ --overwrite \
+ --title='run xqerl instance in a docker container'\
+ --idle-time-limit 1 \
+ --command="\
+sleep 1 && printf %60s | tr ' ' '='  && echo && \
+echo ' - start the container ... ' && \
+make --silent up  && echo && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo"
+
+
+.PHONY: rec-init
+rec-init:
+	@npm install -g asciicast-to-svg
+	@npm install -g svg-term-cli
+	
+.PHONY: rec-to-svg
+rec-to-svg:
+	@cat ../tmp/up.cast | svg-term > ../tmp/up.svg
+	@firefox --new-tab ../tmp/up.svg
+	#w3m -dump ../tmp/up.svg
+
+
 
 PHONY: play
 play:

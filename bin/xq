@@ -5,6 +5,7 @@ IFS=$'\n\t'
 source .env
 XQERL_IMAGE=docker.pkg.github.com/$REPO_OWNER/$REPO_NAME/$RUN_NAME:$GHPKG_VER
 MountAssets="type=volume,target=$XQERL_HOME/priv/static/assets,source=static-assets"
+# make sure we have a home bin on path
 #trap cleanup SIGINT SIGTERM ERR EXIT
 # https://github.com/lhunath/scripts/blob/66c734c96ff745b43daf89ddc81cdbcded881df7/bashlib/bashlib
 # source .version.env
@@ -18,11 +19,29 @@ function msg() {
 }
 
 function help() { ## show this help	 db-exists)
-  msg "Usage: xq  action [arg]*" 
+  msg "Usage: xq <action> [arg]*" 
 	cat "${BASH_SOURCE[0]}" |  
   grep -oP '[a-z-]+[)]{1}([ ]+)?[#]{2}(.+)$' |
   awk 'BEGIN {FS = ").*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $1, $2}'
 }
+
+function initBin() {
+# make sure we have a home bin on path
+  local HOME_BIN=$HOME/.local/bin
+  if [[ ! "$PATH" == *${HOME_BIN}* ]]; then
+    echo ' - create home bin'
+    export PATH="$PATH:${HOME_BIN}"
+  fi
+
+ local CWD="$(pwd)"
+ pushd $HOME_BIN &>/dev/null
+  if [[ ! -L  xq ]]; then
+    echo ' - create link'
+    ln -s $CWD/bin/xq
+  fi
+ popd &>/dev/null
+}
+
 
 # check required arguments
 [[ ${#args[@]} -eq 0 ]] && help && exit
@@ -307,6 +326,9 @@ case "${args[0]}" in
  sh)  ## {cmd-string} run alpine busybox shell commands: `xq sh 'date -I'
       docker exec xq /bin/sh -c "${args[1]}"
       ;;
+ init) 
+    initBin
+    ;;
   *)
     help
     die 'unknown action try one of the above actions'
