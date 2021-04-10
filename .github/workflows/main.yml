@@ -10,6 +10,7 @@ jobs:
           fetch-depth: 1
       - name: Build Docker Image From xqerl repo
         run: |
+          mkdir -p $HOME/.local/bin
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           pushd $HOME/.local/bin && ln -s ${GITHUB_WORKSPACE}/bin/xq && popd
           which xq
