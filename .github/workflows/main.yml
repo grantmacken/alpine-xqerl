@@ -87,10 +87,10 @@ jobs:
           echo "> bin/xq query 'current-date() => string()'"
           bin/xq query 'current-date() => string()'
           printf %60s | tr ' ' '-' && echo
-          echo ' note: main module *compile* sources are located in the "./src/main_modules/" directory'
-          echo ' note: library module *compile* sources are located in the "./src/library_modules/" directory'
-          echo ' note: main modules will have a *xq* extension'
-          echo ' note: library modules will have a *xqm* extension'
+          echo ' note - main module *compile* sources are located in the "./src/main_modules/" directory'
+          echo ' note - library module *compile* sources are located in the "./src/library_modules/" directory'
+          echo ' note - main modules will have a *xq* extension'
+          echo ' note - library modules will have a *xqm* extension'
           echo ' - `xq compile {filename}` compiles xQuery files so they run on the beam'
           echo '> bin/xq compile put-item.xq'
           bin/xq compile put-item.xq
