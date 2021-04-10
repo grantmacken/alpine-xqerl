@@ -10,24 +10,7 @@ jobs:
           fetch-depth: 1
       - name: Build Docker Image From xqerl repo
         run: |
-          make shell
-          make build
-      - name: Start running xqerl
-        run: |
-          make up
-          printf %60s | tr ' ' '-' && echo
-      - name: Github login in and pull helper github packages
-        run: |
-          source .env
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin &>/dev/null
-          docker pull docker.pkg.github.com/grantmacken/alpine-scour/scour:0.0.2
-          docker pull docker.pkg.github.com/grantmacken/alpine-zopfli/zopfli:0.0.1
-      - name: xq commands check
-        run: |
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          $HOME/.local/bin && ln -s ${GITHUB_WORKSPACE}/bin/xq
+          pushd $HOME/.local/bin && ln -s ${GITHUB_WORKSPACE}/bin/xq && popd
           which xq
-      - name: Stop running xqerl
-        run: |
-          make down
-          printf %60s | tr ' ' '-' && echo
+  
