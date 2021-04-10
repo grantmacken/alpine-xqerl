@@ -29,7 +29,7 @@ jobs:
           echo ' - xq CRUD database actions [ put list available get delete link  ] '
           printf %60s | tr ' ' '=' && echo
           echo ' - all *data* sources are located in the "./src/data/" directory'
-          echo ' - *data* soruce starts with a {domain}. the {domain} is '
+          echo ' - *data* source starts with a {domain}.'
           echo ' - `xq put {data-path}` will store a data source as a db XDM item'
           echo '> bin/xq put example.com/usecase/employees.xml'
           bin/xq put example.com/usecase/employees.xml
@@ -38,7 +38,8 @@ jobs:
           echo '> bin/xq put example.com/usecase/mildred.json'
           bin/xq put example.com/usecase/mildred.json
           printf %60s | tr ' ' '-' && echo
-          echo ' - `xq link {domain} {path}` will store db link to static asset files'
+          echo ' - all *static asset* sources are located in the "./src/static-assets/" directory'
+          echo ' - `xq link {domain} {path}` will store db link to a static asset file'
           echo '> bin/xq link example.com icons/article.svg'
           bin/xq link example.com icons/article.svg
           echo '> bin/xq link example.com icons/article.svg'

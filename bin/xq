@@ -218,7 +218,7 @@ function dbLink() {
     local filename="$XQERL_HOME/priv/static/assets/$dirname/$resource.svgz"
     local uri="http://$domain/$dirname/$resource.svgz"
     docker run --rm --interactive --mount $MountAssets --entrypoint "sh" $XQERL_IMAGE \
-    -c "mkdir -p priv/static/$dirname"
+    -c "mkdir -p priv/static/assets/$dirname"
     cat $srcFile | \
     docker run --rm --interactive docker.pkg.github.com/grantmacken/alpine-scour/scour:0.0.2 | \
     docker run --rm --interactive docker.pkg.github.com/grantmacken/alpine-zopfli/zopfli:0.0.1 | \
