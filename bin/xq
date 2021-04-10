@@ -101,10 +101,11 @@ function isDocAvailable() {
 
 function isAvailable() {
   local resource="http://$(echo $1 | grep -oP '^(http://)?\K(.+)$')"
+  echo $resource
   docker exec xq xqerl escript bin/scripts/query.escript \
     "( '$resource' = ( remove( \
         '$resource' => \
-        tokenize('/'),'$1' => \
+        tokenize('/'),'$resource' => \
         tokenize('/') => \
         count()\
         )\
