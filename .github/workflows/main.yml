@@ -60,15 +60,14 @@ jobs:
           bin/xq available example.com/usecase/nothing.json
           printf %60s | tr ' ' '-' && echo
           echo ' - `xq get {db-path}` returns a serialized XDM item'
-          echo ' - array and map XDM items will be serialized as JSON strings'
           echo ' - document-node XDM items will be serialized as XML strings'
           echo '> bin/xq get example.com/usecase/employees.xml'
           bin/xq get example.com/usecase/employees.xml
-          echo '> bin/xq get example.com/usecase/employees.xml'
-          bin/xq get example.com/usecase/colors.array
+          echo ' - array and map XDM items will be serialized as JSON strings'
           echo '> bin/xq get example.com/usecase/colors.array'
+          bin/xq get example.com/usecase/colors.array
           printf %60s | tr ' ' '-' && echo
-          echo ' - `xq delete {db-path}` deletes a XDM item from the db'
+          echo ' - `xq delete {db-path}` deletes XDM item from the db'
           echo '> bin/xq delete example.com/usecase/employees.xml'
           bin/xq delete example.com/usecase/employees.xml
           printf %60s | tr ' ' '=' && echo
@@ -79,18 +78,22 @@ jobs:
           echo "> bin/xq query 'current-date() => string()'"
           bin/xq query 'current-date() => string()'
           printf %60s | tr ' ' '-' && echo
+          echo ' note: main module *compile* sources are located in the "./src/main_modules/" directory'
+          echo ' note: library module *compile* sources are located in the "./src/library_modules/" directory'
+          echo ' note: main modules will have a *xq* extension'
+          echo ' note: library modules will have a *xqm* extension'
           echo ' - `xq compile {filename}` compiles xQuery files so they run on the beam'
           echo '> bin/xq compile put-item.xq'
           bin/xq compile put-item.xq
-          printf %60s | tr ' ' '-' && echo
-          echo ' - `xq run {filename} {argument}` runs compiled xQuerys with a external argumnent'
+          echo && printf %60s | tr ' ' '-' && echo
+          echo ' - `xq run {filename} {argument}` runs compiled xQuery with a single external argument'
           echo '> bin/xq run turtles.xq turtles'
           bin/xq run turtles.xq turtles
-          echo '> bin/xq run turtles.xq turtles'
+          echo '> bin/xq run turtles.xq elephants'
           bin/xq run turtles.xq elephants
           printf %60s | tr ' ' '-' && echo
           echo '> bin/xq call xqldb_db_server exists http://example.com'
-          bin/xq call xqldb_db_server exists http://example.com
+          bin/xq call xqldb_db_server exists 'http://example.com'
           printf %60s | tr ' ' '-' && echo
           echo '>  bin/xq eval "calendar:local_time()."'
           bin/xq eval 'calendar:local_time().'
