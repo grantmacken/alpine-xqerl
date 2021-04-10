@@ -24,8 +24,9 @@ jobs:
           docker pull docker.pkg.github.com/grantmacken/alpine-zopfli/zopfli:0.0.1
       - name: xq commands check
         run: |
-          echo ' - init make sure HOME bin on exec PATH and symlink to project bin'
-          echo $PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          $HOME/.local/bin && ln -s ${GITHUB_WORKSPACE}/bin/xq
+          which xq
       - name: Stop running xqerl
         run: |
           make down
