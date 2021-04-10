@@ -229,7 +229,7 @@ function dbLink() {
     docker run --rm --interactive --mount $MountAssets --entrypoint "sh" $XQERL_IMAGE \
       -c "ls $filename"
     echo -n ' - db link to asset: '
-    xq list http://$domain/$dirname | grep -oP "http://$domain/$dirname/$resource.svgz"
+    dbList http://$domain/$dirname | grep -oP "http://$domain/$dirname/$resource.svgz"
     ;;
   *)
     die "[ $assetType ] unknown asset type "

@@ -12,7 +12,7 @@ MountAssets := type=volume,target=$(XQERL_HOME)/priv/static/assets,source=static
 BindMount := type=bind,target=/tmp,source=$(CURDIR)/src/data
 
 .PHONY: up
-up: clean
+up:
 	@echo '| $(@): $(XQERL_IMAGE) |'
 	@if ! docker container inspect -f '{{.State.Running}}' $(RUN_NAME) &>/dev/null
 	then 
