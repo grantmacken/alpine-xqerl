@@ -3,8 +3,7 @@
 rec-xq-db:
 	@mkdir -p ../tmp
 	@svg-term \
- --out docs/$(@).svg \
- --window \
+ --out docs/images/$(@).svg \
  --width 80 \
  --command="\
 echo ' - xq actions ' && \
@@ -62,7 +61,7 @@ sleep 1 && echo \"> xq delete example.com/usecase/employees.xml \" && \
 sleep 1 && xq delete example.com/usecase/employees.xml && \
 sleep 1 && printf %60s | tr ' ' '='"
 	@#cat ../tmp/$(@).cast | svg-term --out docs/$(@).svg --window
-	@firefox --new-tab docs/$(@).svg
+	@firefox --new-tab docs/images/$(@).svg
 
 .PHONY: rec-xq
 rec-xq:
