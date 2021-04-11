@@ -17,7 +17,7 @@ jobs:
         run: |
           mkdir -p $HOME/.local/bin
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          pushd $HOME/.local/bin && ln -s ${GITHUB_WORKSPACE}/xq && popd
+          pushd $HOME/.local/bin && ln -s ${GITHUB_WORKSPACE}/bin/xq && popd
           which xq
       - name: Github login in and pull helper github packages
         run: |
