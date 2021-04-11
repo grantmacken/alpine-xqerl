@@ -21,7 +21,7 @@
     the .env file. 
 
 ## TODO:  
- - [ ] [docs](docs/index.html)
+ - [ ] doc pages
 
 
 [xqerl](https://zadean.github.io/xqerl) is in constant development, 
