@@ -18,7 +18,7 @@
   - [x] in container added tzdata for timezone resolution
   - [x] bin dir contains a cli for xqerl 
 
-[![asciicast](https://asciinema.org/a/405889.svg)](https://asciinema.org/a/405889)
+![xqExample](./docs/rec-xq-db.svg)
 
 [xqerl](https://zadean.github.io/xqerl) is in constant development, 
 so I have also tagged images with the xqerl [main](https://github.com/zadean/xqerl) git commit sha.  These tagged images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl/tags)

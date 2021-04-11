@@ -57,7 +57,7 @@ sleep 1 &&  xq get example.com/usecase/colors.array && \
 sleep 1 &&  echo '> xq get example.com/usecase/mildred.map' && \
 sleep 1 &&  xq get example.com/usecase/mildred.map && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-sleep 1 &&  echo '  \"xq db {db-path}\" deletes a db item or db link' && \
+sleep 1 &&  echo '  \"xq delete {db-path}\" deletes a db item or db link' && \
 sleep 1 && echo \"> xq delete example.com/usecase/employees.xml \" && \
 sleep 1 && xq delete example.com/usecase/employees.xml && \
 sleep 1 && printf %60s | tr ' ' '='"
