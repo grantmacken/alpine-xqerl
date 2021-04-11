@@ -2,10 +2,10 @@
 .PHONY: rec-xq-db
 rec-xq-db:
 	@mkdir -p ../tmp
-	@asciinema rec ../tmp/$(@).cast \
- --overwrite \
- --title='xq - a cli for xqerl: xqerl database commands'\
- --idle-time-limit 1 \
+	@svg-term \
+ --out docs/$(@).svg \
+ --window \
+ --width 80 \
  --command="\
 echo ' - xq actions ' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
@@ -61,7 +61,7 @@ sleep 1 &&  echo '  \"xq delete {db-path}\" deletes a db item or db link' && \
 sleep 1 && echo \"> xq delete example.com/usecase/employees.xml \" && \
 sleep 1 && xq delete example.com/usecase/employees.xml && \
 sleep 1 && printf %60s | tr ' ' '='"
-	@cat ../tmp/$(@).cast | svg-term > docs/$(@).svg
+	@#cat ../tmp/$(@).cast | svg-term --out docs/$(@).svg --window
 	@firefox --new-tab docs/$(@).svg
 
 .PHONY: rec-xq
@@ -100,7 +100,7 @@ sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq sh 'date -I'\" && \
 sleep 1 && xq sh 'date -I' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo"
-	@cat ../tmp/$(@).cast | svg-term > ../tmp/$(@).svg
+	@cat ../tmp/$(@).cast | svg-term  --out ../tmp/$(@).svg
 	@firefox --new-tab ../tmp/$(@).svg
 
 
