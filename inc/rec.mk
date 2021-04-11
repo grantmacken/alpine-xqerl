@@ -1,35 +1,76 @@
 
-.PHONY: rec
-rec:
+.PHONY: rec-xq-db
+rec-xq-db:
 	@mkdir -p ../tmp
-	@asciinema rec ../tmp/up.cast \
- --overwrite \
- --title='grantmacken/xq - a cli for xqerl'\
- --idle-time-limit 1 \
+	@svg-term \
+ --out docs/images/$(@).svg \
+ --width 80 \
  --command="\
-sleep 1 && printf %60s | tr ' ' '='  && echo && \
-echo ' - start the container ... ' && \
-make --silent up  && echo && \
-sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo ' - xq actions ' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq \" && \
 sleep 1 && xq && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-echo ' - xq CRUD database actions [ put list get delete |  ] ' && \
+echo ' - xq database actions [ put link available list get delete ] ' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-echo \"> xq put example.com/usecase/employees.xml \" && \
+sleep 1 && echo '  \"xq put {data-path}\"  will store a data source as a db XDM item' && \
+sleep 1 && echo '  all *data* sources are located in the \"./src/data/\" directory' && \
+echo '> xq put example.com/usecase/employees.xml' && \
 sleep 1 && xq put example.com/usecase/employees.xml && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+sleep 1 && echo '> xq put example.com/usecase/colors.json' && \
+sleep 1 && xq put example.com/usecase/colors.json && \
+sleep 1 && echo '> xq put example.com/usecase/mildred.json' && \
+sleep 1 && xq put example.com/usecase/mildred.json  && \
+sleep 1 && printf %60s | tr ' ' '='  && echo && \
+sleep 1 && echo '  \"xq link {domain} {path}\" will store a db link to a static asset file' && \
+sleep 1 && echo '  the {domain} arg is the database name' && \
+sleep 1 && echo '  the {path} arg is path to the source file' && \
+sleep 1 && echo '  all *link* sources are located in the \"./src/static_assets\" directory' && \
+sleep 1 && echo '> xq link example.com icons/article.svg'  && \
+sleep 1 && xq link example.com icons/article.svg  && \
+sleep 1 && echo '> xq link example.com icons/note.svg'  && \
+sleep 1 && xq link example.com icons/note.svg  && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+sleep 1 &&  echo '  \"xq available {db-path}\" returns true or false' && \
+sleep 1 &&  echo '> xq available example.com/usecase/colors.array' && \
+sleep 1 && xq available example.com/usecase/colors.array  && \
+sleep 1 &&  echo '> xq available example.com/usecase/nothing.array' && \
+sleep 1 && xq available example.com/usecase/nothing.array && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+sleep 1 &&  echo '  \"xq list {db-path}\" lists db items and db links' && \
 echo \"> xq list example.com/usecase \" && \
 sleep 1 && xq list example.com/usecase && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-echo \"> xq get example.com/usecase/employees.xml \" && \
+echo \"> xq list example.com/icons \" && \
+sleep 1 && xq list example.com/icons && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+sleep 1 &&  echo '  \"xq get {db-path}\" returns a serialized XDM item' && \
+sleep 1 &&  echo '  document-node XDM items will be serialized as XML strings' && \
+sleep 1 && echo \"> xq get example.com/usecase/employees.xml \" && \
 sleep 1 && xq get example.com/usecase/employees.xml && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
-echo \"> xq delete example.com/usecase/employees.xml \" && \
-sleep 1 && xq delete example.com/usecase/employees.xml && \
+sleep 1 && echo ' array and map XDM items will be serialized as JSON strings' && \
+sleep 1 &&  echo '> xq get example.com/usecase/colors.array' && \
+sleep 1 &&  xq get example.com/usecase/colors.array && \
+sleep 1 &&  echo '> xq get example.com/usecase/mildred.map' && \
+sleep 1 &&  xq get example.com/usecase/mildred.map && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+sleep 1 &&  echo '  \"xq delete {db-path}\" deletes a db item or db link' && \
+sleep 1 && echo \"> xq delete example.com/usecase/employees.xml \" && \
+sleep 1 && xq delete example.com/usecase/employees.xml && \
+sleep 1 && printf %60s | tr ' ' '='"
+	@#cat ../tmp/$(@).cast | svg-term --out docs/$(@).svg --window
+	@firefox --new-tab docs/images/$(@).svg
+
+.PHONY: rec-xq
+rec-xq:
+	@mkdir -p ../tmp
+	@asciinema rec ../tmp/$(@).cast \
+ --overwrite \
+ --title='xq - a cli for xqerl'\
+ --idle-time-limit 1 \
+ --command="\
 echo ' - xQuery actions [ query | compile | run ] ' && \
 sleep 1 && printf %60s | tr ' ' '='  && echo && \
 echo \"> xq compile turtles.xq\" && \
@@ -58,6 +99,38 @@ sleep 1 && printf %60s | tr ' ' '-'  && echo && \
 echo \"> xq sh 'date -I'\" && \
 sleep 1 && xq sh 'date -I' && \
 sleep 1 && printf %60s | tr ' ' '-'  && echo"
+	@cat ../tmp/$(@).cast | svg-term  --out ../tmp/$(@).svg
+	@firefox --new-tab ../tmp/$(@).svg
+
+
+.PHONY: rec-up
+rec-up:
+	@mkdir -p ../tmp
+	@asciinema rec ../tmp/$(@).cast \
+ --overwrite \
+ --title='run xqerl instance in a docker container'\
+ --idle-time-limit 1 \
+ --command="\
+sleep 1 && printf %60s | tr ' ' '='  && echo && \
+echo ' - start the container ... ' && \
+make --silent up  && echo && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo"
+	@#cat ../tmp/$(@).cast | svg-term > ../tmp/$(@).svg
+	@#firefox --new-tab ../tmp/$(@).svg
+
+
+.PHONY: rec-init
+rec-init:
+	@npm install -g asciicast-to-svg
+	@npm install -g svg-term-cli
+	
+.PHONY: rec-to-svg
+rec-to-svg:
+	@cat ../tmp/up.cast | svg-term > ../tmp/up.svg
+	@firefox --new-tab ../tmp/up.svg
+	#w3m -dump ../tmp/up.svg
+
+
 
 PHONY: play
 play:

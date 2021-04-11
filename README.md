@@ -15,10 +15,14 @@
  - [x] uses config values in .env file to set some xqerl.config values. This is of interest only if you wish to build the image
    yourself. In xqerl repo the  `./config/xqerl.config`, item `environment_access` is set to `false`. Our docker image
    is built with this var set to `true`. If you want to keep the default, clone this repo and in the file `.env` set `CONFIG_ENVIRONMENT_ACCESS=false`, then run `make` to build the image.
-  - [x] in container added tzdata for timezone resolution
-  - [x] bin dir contains a cli for xqerl 
+  - [x] bin dir contains a [terminal cli for xqerl](./docs/images/rec-xq-db.svg)
+  - [x] removed docker-compose example file instead you can clone this repo and use `make up`
+  - [x] in container added tzdata for timezone resolution. Set your timezone in
+    the .env file. 
 
-[![asciicast](https://asciinema.org/a/405889.svg)](https://asciinema.org/a/405889)
+## TODO:  
+ - [ ] doc pages
+
 
 [xqerl](https://zadean.github.io/xqerl) is in constant development, 
 so I have also tagged images with the xqerl [main](https://github.com/zadean/xqerl) git commit sha.  These tagged images are available on [dockerhub](https://hub.docker.com/r/grantmacken/alpine-xqerl/tags)
