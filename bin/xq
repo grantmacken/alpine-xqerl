@@ -281,7 +281,7 @@ case "${args[0]}" in
   delete) ## {domain}/{path} delete resource from db. example: `xq delete example.com/static-assets/icons/article.svg`
    dbDeleteItem "${args[1]}"
    ;;
-  #domain) ## {domain} check if domain exists in db. example: `xq db-exists example.com` 
+  #domain) # {domain} check if domain exists in db. example: `xq db-exists example.com` 
   #  dbDomainExists ${args[1]}
   # ;;
   #type) TODO {domain}/{path} get xdm type. example: `xdm item-type example.com/usecase/employees.xml`
