@@ -256,6 +256,15 @@ function dbLink() {
   esac
 }
 
+function doReq() {
+  local uri="$1"
+  local xpath="$2"
+  docker exec xq xqerl escript bin/scripts/query.escript \
+    "declare default element namespace 'http://www.w3.org/1999/xhtml'; \
+    try{(<http:request method='get' href='$uri' /> => http:send-request())[2]${xpath} => \
+    serialize( map {'indent': true() })} catch * {()}"
+}
+
 case "${args[0]}" in
   put) ## {domain}/{path} create xdm item from file. example: `xq put example.com/usecase/employees.xml`
     dbFilePut ${args[1]}
@@ -306,6 +315,10 @@ case "${args[0]}" in
   # ========================================
   query) ## {xquery-string} run a simple xQuery. example: `xq query "current-date() => string()"`
     docker exec xq xqerl escript bin/scripts/query.escript  "${args[1]}"
+    ;;
+  req) ## {uri} {xpath} fetch a HTML doc, apply xpath expression. example: `xq req "http://example.com" "/*"`
+    [[ ${#args[@]} -eq 3 ]] || die 'xq run: requires 2 params {uri} {xpath} '
+   doRec  "${args[1]}" "${args[2]}"
     ;;
   compile) ## {path} xQuery module. example: `xq compile src/main_modules/put-item.xq`
     doCompile "${args[1]}"
