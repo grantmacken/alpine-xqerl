@@ -134,8 +134,8 @@ jobs:
           '//*[./*/@id="Command-line_tools"]/following-sibling::ul[1]/li ! concat(position(),":","&#9;",./string(),"&#10;")'
       - name: xq lookup command
         run: |
-          echo ' - `xq req {uri} {xpath}`' 
-          echo 'fetch a HTML doc, apply xpath expression'
+          echo ' - `xq lookup {uri} {lookup}`' 
+          echo 'fetch a JSON doc, apply xQuery lookup expression'
           echo 'example: get the latest commit sha to the zadean/xqerl repo'
           echo '> xq lookup \'
           echo '> https://api.github.com/repos/zadean/xqerl/git/refs/heads/main \' 

@@ -1,4 +1,21 @@
 
+.PHONY: visit
+visit: 
+	@echo 'firefox --newwindow https://$(REPO_OWNER).github.io/$(REPO_NAME)'
+	@firefox https://$(REPO_OWNER).github.io/$(REPO_NAME)
+
+.PHONY: pr-create
+pr-create: 
+	gh pr create --help
+	gh pr create --fill
+
+.PHONY: pr-merge
+pr-merge: 
+	gh pr merge --help
+	gh pr merge -s -d
+	git pull
+
+
 .PHONY: rec-xq-db
 rec-xq-db:
 	@svg-term \
