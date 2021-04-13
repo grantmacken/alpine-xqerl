@@ -42,7 +42,6 @@ function initBin() {
  popd &>/dev/null
 }
 
-
 # check required arguments
 [[ ${#args[@]} -eq 0 ]] && help && exit
 
@@ -256,13 +255,13 @@ function dbLink() {
   esac
 }
 
-function doReq() {
+function doRec() {
   local uri="$1"
   local xpath="$2"
   docker exec xq xqerl escript bin/scripts/query.escript \
     "declare default element namespace 'http://www.w3.org/1999/xhtml'; \
     try{(<http:request method='get' href='$uri' /> => http:send-request())[2]${xpath} => \
-    serialize( map {'indent': true() })} catch * {()}"
+    serialize()} catch * {()}"
 }
 
 case "${args[0]}" in
@@ -317,7 +316,7 @@ case "${args[0]}" in
     docker exec xq xqerl escript bin/scripts/query.escript  "${args[1]}"
     ;;
   req) ## {uri} {xpath} fetch a HTML doc, apply xpath expression. example: `xq req "http://example.com" "/*"`
-    [[ ${#args[@]} -eq 3 ]] || die 'xq run: requires 2 params {uri} {xpath} '
+    [[ ${#args[@]} -eq 3 ]] || die 'xq run: requires 2 params {uri} {xpath}'
    doRec  "${args[1]}" "${args[2]}"
     ;;
   compile) ## {path} xQuery module. example: `xq compile src/main_modules/put-item.xq`

@@ -115,6 +115,23 @@ jobs:
           echo ">  xq  sh 'date -I'"
           xq  sh 'date -I'
           printf %60s | tr ' ' '-' && echo
+      - name: xq req command
+        run: |
+          printf %60s | tr ' ' '-' && echo
+          echo ' - `xq req {uri} {xpath}` fetch a HTML doc, apply xpath expression'
+          echo '  to fetch html text use element selector "/*"'
+          echo '> xq req http://example/com "/*"'
+          xq req 'https://example.com' '/*'
+          echo '  use complex xpath 3.1 xpath expressions'
+          echo '  that include the "!" or "=>" operators'
+          echo '  example: fetch wikipedia XPath page and get the xPath commandline tools'
+          echo '  to list wikipedia xPath commandline tools'
+          echo '> xq req \'
+          echo '> https://en.wikipedia.org/wiki/XPath \' 
+          echo '> //*[./*/@id="Command-line_tools"]/following-sibling::ul[1]/li/string()=>string-join(\"&#10;\")'
+          xq req \
+          'https://en.wikipedia.org/wiki/XPath' \
+          '//*[./*/@id="Command-line_tools"]/following-sibling::ul[1]/li ! concat(position(),":","&#9;",./string(),"&#10;")'
       - name: Stop running xqerl
         run: |
           make down

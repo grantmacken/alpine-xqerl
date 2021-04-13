@@ -1,7 +1,6 @@
 
 .PHONY: rec-xq-db
 rec-xq-db:
-	@mkdir -p ../tmp
 	@svg-term \
  --out docs/images/$(@).svg \
  --width 80 \
@@ -62,6 +61,49 @@ sleep 1 && xq delete example.com/usecase/employees.xml && \
 sleep 1 && printf %60s | tr ' ' '='"
 	@#cat ../tmp/$(@).cast | svg-term --out docs/$(@).svg --window
 	@firefox --new-tab docs/images/$(@).svg
+
+.PHONY: rec-xq-req
+rec-xq-req:
+	@mkdir -p ../tmp
+	@asciinema rec ../tmp/$(@).cast \
+ --overwrite \
+ --title='xq req: fetch a HTML doc, apply xpath expression'\
+ --idle-time-limit 5 \
+ --command="\
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+echo '  \"xq req {uri} {xpath expression}\" fetch a HTML doc, apply xpath expression'  && sleep 1 && \
+sleep 3 && printf %60s | tr ' ' '-'  && echo && \
+echo '  example: fetch http://example.com and get the html element'  && sleep 1 && \
+echo '> xq req http://example.com \"/*\"'  && \
+xq req 'https://example.com' '/*' && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+sleep 3 && clear && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+sleep 1 && echo '  use complex xpath 3.1 xpath expressions' && \
+sleep 1 && echo '  that include the \"!\" or \"=>\" operators' && \
+echo '  example: fetch wikipedia XPath page and get the xPath commandline tools'  && sleep 1 && \
+echo '  and use the bang operator to create a numbered list'  && sleep 1 && \
+echo '> xq req https://en.wikipedia.org/wiki/XPath\\' && sleep 1 && \
+echo '> //*[./*/@id=\"Command-line_tools\"]/following-sibling::ul[1]/li/string()\\' && sleep 1 && \
+echo '> !concat(position(),\":\",\"&#9;\",./string(),\"&#10;\")' && sleep 1 && \
+xq req 'https://en.wikipedia.org/wiki/XPath' \
+'//*[./*/@id=\"Command-line_tools\"]/following-sibling::ul[1]/li \
+! concat(position(),\":\",\"&#9;\",./string(),\"&#10;\")' && sleep 1 && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo &&  \
+sleep 3 && clear && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+echo '  example: fetch the xpath-functions-31 page and'  && sleep 1 && \
+echo '  use the arrow operator to create a sorted list'  && sleep 1 && \
+echo '> xq req https://www.w3.org/TR/xpath-functions-31' && sleep 1 && \
+echo '> /html/body/nav//span[@class=\"content\"]\\' && sleep 1 && \
+echo '> [matches(.,\"^(fn|op|map|array|math):\")]/string()\\' && sleep 1 && \
+echo '> =>sort()=>string-join(\"&#10;\")' && \
+xq req 'https://www.w3.org/TR/xpath-functions-31' \
+'/html/body/nav//span[@class=\"content\"]\
+[matches(.,\"^(fn|op|map|array|math):\")]/string()\
+=> sort() => string-join(\"&#10;\")' && \
+sleep 3 && printf %60s | tr ' ' '='  && echo"
+	asciinema upload ../tmp/$@.cast
 
 .PHONY: rec-xq
 rec-xq:
@@ -134,7 +176,7 @@ rec-to-svg:
 
 PHONY: play
 play:
-	@asciinema play ../tmp/up.cast
+	@asciinema play ../tmp/rec-xq-req.cast
 
 .PHONY: upload
 upload:
