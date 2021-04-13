@@ -105,6 +105,32 @@ xq req 'https://www.w3.org/TR/xpath-functions-31' \
 sleep 3 && printf %60s | tr ' ' '='  && echo"
 	asciinema upload ../tmp/$@.cast
 
+.PHONY: rec-xq-lookup
+rec-xq-lookup:
+	@mkdir -p ../tmp
+	@asciinema rec ../tmp/$(@).cast \
+ --overwrite \
+ --title='xq lookup: fetch a json doc, apply lookup expression'\
+ --idle-time-limit 5 \
+ --command="\
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+echo '  xq req {uri} {lookup expression} ' && sleep 1 && \
+echo '  fetch a JSON doc, apply lookup expression'  && sleep 1 && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+echo 'example: get the latest commit sha to the zadean/xqerl repo'  && sleep 1 && \
+echo '> xq lookup \\'  && sleep 1 && \
+echo '> https://api.github.com/repos/zadean/xqerl/git/refs/heads/main \\'  && sleep 1 && \
+echo '> ?object?sha'  && sleep 1 && \
+xq lookup https://api.github.com/repos/grantmacken/alpine-xqerl/git/refs/heads/main ?object?sha && sleep 1 && \
+sleep 1 && printf %60s | tr ' ' '-'  && echo && \
+echo 'example: get a list of public apis' && sleep 1 && \
+echo '> xq lookup \\'  && sleep 1 && \
+echo '> https://api.publicapis.org/entries \\'  && sleep 1 && \
+echo '> ?entries?*?API=>sort()=>string-join(\"&#10;\")' && sleep 1 && \
+xq lookup https://api.publicapis.org/entries \"?entries?*?API=>sort()=>string-join('&#10;')\" && \
+sleep 3 && printf %60s | tr ' ' '='  && echo"
+	asciinema upload ../tmp/$@.cast
+
 .PHONY: rec-xq
 rec-xq:
 	@mkdir -p ../tmp

@@ -132,6 +132,25 @@ jobs:
           xq req \
           'https://en.wikipedia.org/wiki/XPath' \
           '//*[./*/@id="Command-line_tools"]/following-sibling::ul[1]/li ! concat(position(),":","&#9;",./string(),"&#10;")'
+      - name: xq lookup command
+        run: |
+          echo ' - `xq req {uri} {xpath}`' 
+          echo 'fetch a HTML doc, apply xpath expression'
+          echo 'example: get the latest commit sha to the zadean/xqerl repo'
+          echo '> xq lookup \'
+          echo '> https://api.github.com/repos/zadean/xqerl/git/refs/heads/main \' 
+          echo '> ?object?sha'
+          xq lookup \
+          https://api.github.com/repos/grantmacken/alpine-xqerl/git/refs/heads/main \
+          ?object?sha
+          printf %60s | tr ' ' '-' && echo
+          echo 'example: get a list of public apis'
+          echo '> xq lookup \'
+          echo '> https://api.publicapis.org/entries \'          
+          echo '> ?entries?*?API=>sort()=>string-join(\"&#10;\")'
+          xq lookup \
+          https://api.publicapis.org/entries \
+          "?entries?*?API=>sort()=>string-join('&#10;')"
       - name: Stop running xqerl
         run: |
           make down
