@@ -264,6 +264,14 @@ function doRec() {
     serialize()} catch * {()}"
 }
 
+function doLookup() {
+  local uri="$1"
+  local lookup="$2"
+  # local query="$2"
+  docker exec xq xqerl escript bin/scripts/query.escript \
+    "try{('${uri}' => json-doc())${lookup} } catch * {()}" 
+}
+
 case "${args[0]}" in
   put) ## {domain}/{path} create xdm item from file. example: `xq put example.com/usecase/employees.xml`
     dbFilePut ${args[1]}
@@ -318,6 +326,11 @@ case "${args[0]}" in
   req) ## {uri} {xpath} fetch a HTML doc, apply xpath expression. example: `xq req "http://example.com" "/*"`
     [[ ${#args[@]} -eq 3 ]] || die 'xq run: requires 2 params {uri} {xpath}'
    doRec  "${args[1]}" "${args[2]}"
+    ;;
+  lookup) ## {uri} {xpath} fetch a JDOM doc, apply expression. example: \
+        ##`xq jreq "https://api.github.com/repos/grantmacken/alpine-xqerl" "?"`
+   #[[ ${#args[@]} -eq 3 ]] || die 'xq run: requires 2 params {uri} {xpath}'
+   doLookup  "${args[1]}" "${args[2]}"
     ;;
   compile) ## {path} xQuery module. example: `xq compile src/main_modules/put-item.xq`
     doCompile "${args[1]}"
