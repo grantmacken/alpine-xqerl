@@ -267,7 +267,6 @@ function doRec() {
 function doLookup() {
   local uri="$1"
   local lookup="$2"
-  # local query="$2"
   docker exec xq xqerl escript bin/scripts/query.escript \
     "try{('${uri}' => json-doc())${lookup} } catch * {()}" 
 }
@@ -323,13 +322,12 @@ case "${args[0]}" in
   query) ## {xquery-string} run a simple xQuery. example: `xq query "current-date() => string()"`
     docker exec xq xqerl escript bin/scripts/query.escript  "${args[1]}"
     ;;
-  req) ## {uri} {xpath} fetch a HTML doc, apply xpath expression. example: `xq req "http://example.com" "/*"`
-    [[ ${#args[@]} -eq 3 ]] || die 'xq run: requires 2 params {uri} {xpath}'
+  req) ## {uri} {xpath} HTML doc, apply xpath expression. example: `xq req "http://example.com" "/*"`
+    [[ ${#args[@]} -eq 3 ]] || die 'xq req: requires 2 params {uri} {xpath}'
    doRec  "${args[1]}" "${args[2]}"
     ;;
-  lookup) ## {uri} {xpath} fetch a JDOM doc, apply expression. example: \
-        ##`xq jreq "https://api.github.com/repos/grantmacken/alpine-xqerl" "?"`
-   #[[ ${#args[@]} -eq 3 ]] || die 'xq run: requires 2 params {uri} {xpath}'
+  lookup) ## {uri} {lookup} JSON doc, apply lookup expression. example: xq lookup https://api.publicapis.org/entries '?count=>string()'
+   [[ ${#args[@]} -eq 3 ]] || die 'xq lookup: requires 2 params {uri} {lookup-expression}'
    doLookup  "${args[1]}" "${args[2]}"
     ;;
   compile) ## {path} xQuery module. example: `xq compile src/main_modules/put-item.xq`
