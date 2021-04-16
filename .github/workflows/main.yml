@@ -1,9 +1,5 @@
 name: CI
-on: 
-  push:
-    branches:
-      - 'main'
-
+on: push
 jobs:
   dockerize_xqerl:
     runs-on: ubuntu-latest
@@ -12,147 +8,27 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
-
       - name: Build Docker Image From xqerl repo
         run: |
           make shell
           make build
-      - name: set up local bin
-        run: |
-          mkdir -p $HOME/.local/bin
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          pushd $HOME/.local/bin && ln -s ${GITHUB_WORKSPACE}/bin/xq && popd
-          which xq
-      - name: Github login in and pull helper github packages
-        run: |
-          source .env
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin &>/dev/null
-          docker pull docker.pkg.github.com/grantmacken/alpine-scour/scour:0.0.2
-          docker pull docker.pkg.github.com/grantmacken/alpine-zopfli/zopfli:0.0.1
       - name: Start running xqerl
         run: |
           make up
           printf %60s | tr ' ' '-' && echo
-      - name: xq commands check
-        run: |
-          printf %60s | tr ' ' '-' && echo
-          echo ' list "xq" available commands'
-          echo '> xq'
-          xq
-          printf %60s | tr ' ' '-' && echo
-          echo ' - xq CRUD database actions [ put list available get delete link  ] '
-          printf %60s | tr ' ' '=' && echo
-          echo ' - all *data* sources are located in the "./src/data/" directory'
-          echo ' - *data* source starts with a {domain}.'
-          echo ' - `xq put {data-path}` will store a data source as a db XDM item'
-          echo '> xq put example.com/usecase/employees.xml'
-          xq put example.com/usecase/employees.xml
-          echo '> xq put example.com/usecase/colors.json'
-          xq put example.com/usecase/colors.json
-          echo '> xq put example.com/usecase/mildred.json'
-          xq put example.com/usecase/mildred.json
-          printf %60s | tr ' ' '-' && echo
-          echo ' - all *static asset* sources are located in the "./src/static-assets/" directory'
-          echo ' - `xq link {domain} {path}` will store db link to a static asset file'
-          echo '> xq link example.com icons/article.svg'
-          xq link example.com icons/article.svg
-          echo '> xq link example.com icons/article.svg'
-          xq link example.com icons/article.svg
-          echo '> xq link example.com icons/note.svg'
-          xq link example.com icons/note.svg
-          printf %60s | tr ' ' '-' && echo
-          echo ' - `xq list {db-path}` lists db resources, including links'
-          echo '> xq list example.com/usecase'
-          xq list example.com/usecase
-          echo '> xq list example.com/icons'
-          xq list example.com/icons
-          printf %60s | tr ' ' '-' && echo
-          echo ' - `xq available {db-path}` returns true or false'
-          echo '> xq available example.com/usecase/colors.array'
-          xq available example.com/usecase/colors.json
-          echo '> xq available example.com/usecase/nothing.array'
-          xq available example.com/usecase/nothing.json
-          printf %60s | tr ' ' '-' && echo
-          echo ' - `xq get {db-path}` returns a serialized XDM item'
-          echo ' - document-node XDM items will be serialized as XML strings'
-          echo '> xq get example.com/usecase/employees.xml'
-          xq get example.com/usecase/employees.xml
-          echo ' - array and map XDM items will be serialized as JSON strings'
-          echo '> xq get example.com/usecase/colors.array'
-          xq get example.com/usecase/colors.array
-          printf %60s | tr ' ' '-' && echo
-          echo ' - `xq delete {db-path}` deletes XDM item from the db'
-          echo '> xq delete example.com/usecase/employees.xml'
-          xq delete example.com/usecase/employees.xml
-          printf %60s | tr ' ' '=' && echo
-          echo ' - xQuery actions [ query | compile | run ] ' 
-          printf %60s | tr ' ' '-' && echo
-          echo '  `xq query {expression}` runs a xQuery expression in xqerl'
-          echo '  the expression limation is that the expression should return a string item'
-          echo "> xq query 'current-date() => string()'"
-          xq query 'current-date() => string()'
-          printf %60s | tr ' ' '-' && echo ''
-          echo '  main module *compile* sources are located in the "./src/main_modules/" directory'
-          echo '  library module *compile* sources are located in the "./src/library_modules/" directory'
-          echo ' `xq compile {filename}` compiles xQuery files so they run on the beam'
-          echo '> xq compile put-item.xq'
-          xq compile put-item.xq
-          echo && printf %60s | tr ' ' '-' && echo
-          echo ' - `xq run {filename} {argument}` runs compiled xQuery with a single external argument'
-          echo '> xq run turtles.xq turtles'
-          xq run turtles.xq turtles
-          echo '> xq run turtles.xq elephants'
-          xq run turtles.xq elephants
-          printf %60s | tr ' ' '-' && echo
-          echo '> xq call xqldb_db_server exists http://example.com'
-          xq call xqldb_db_server exists 'http://example.com'
-          printf %60s | tr ' ' '-' && echo
-          echo '>  xq eval "calendar:local_time()."'
-          xq eval 'calendar:local_time().'
-          printf %60s | tr ' ' '-' && echo
-          echo ' - shell actions [ sh ] run alpine busybox shell commands ' 
-          printf %60s | tr ' ' '-' && echo
-          echo ">  xq  sh 'date -I'"
-          xq  sh 'date -I'
-          printf %60s | tr ' ' '-' && echo
-      - name: xq req command
-        run: |
-          printf %60s | tr ' ' '-' && echo
-          echo ' - `xq req {uri} {xpath}` fetch a HTML doc, apply xpath expression'
-          echo '  to fetch html text use element selector "/*"'
-          echo '> xq req http://example/com "/*"'
-          xq req 'https://example.com' '/*'
-          echo '  use complex xpath 3.1 xpath expressions'
-          echo '  that include the "!" or "=>" operators'
-          echo '  example: fetch wikipedia XPath page and get the xPath commandline tools'
-          echo '  to list wikipedia xPath commandline tools'
-          echo '> xq req \'
-          echo '> https://en.wikipedia.org/wiki/XPath \' 
-          echo '> //*[./*/@id="Command-line_tools"]/following-sibling::ul[1]/li/string()=>string-join(\"&#10;\")'
-          xq req \
-          'https://en.wikipedia.org/wiki/XPath' \
-          '//*[./*/@id="Command-line_tools"]/following-sibling::ul[1]/li ! concat(position(),":","&#9;",./string(),"&#10;")'
-      - name: xq lookup command
-        run: |
-          echo ' - `xq lookup {uri} {lookup}`' 
-          echo 'fetch a JSON doc, apply xQuery lookup expression'
-          echo 'example: get the latest commit sha to the zadean/xqerl repo'
-          echo '> xq lookup \'
-          echo '> https://api.github.com/repos/zadean/xqerl/git/refs/heads/main \' 
-          echo '> ?object?sha'
-          xq lookup \
-          https://api.github.com/repos/grantmacken/alpine-xqerl/git/refs/heads/main \
-          ?object?sha
-          printf %60s | tr ' ' '-' && echo
-          echo 'example: get a list of public apis'
-          echo '> xq lookup \'
-          echo '> https://api.publicapis.org/entries \'          
-          echo '> ?entries?*?API=>sort()=>string-join(\"&#10;\")'
-          xq lookup \
-          https://api.publicapis.org/entries \
-          "?entries?*?API=>sort()=>string-join('&#10;')"
       - name: Stop running xqerl
         run: |
           make down
           printf %60s | tr ' ' '-' && echo
-
+      - name: Dockerhub Login In and Push to dockerhub
+        run: |
+          source .env
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io --username ${REPO_OWNER} --password-stdin 
+          docker push ${REPO_OWNER}/${REPO_NAME}:shell
+          docker push ${REPO_OWNER}/${REPO_NAME}:latest
+          docker push ${REPO_OWNER}/${REPO_NAME}:${REPO_SHA}
+      - name: Github Login In and Push to Github Packages
+        run: |
+          source .env
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin
+          docker push docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${RUN_NAME}:${GHPKG_VER}
