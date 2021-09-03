@@ -5,7 +5,7 @@ SHELL=/bin/bash
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 include .env
-XQERL_IMAGE := docker.pkg.github.com/$(REPO_OWNER)/$(REPO_NAME)/$(RUN_NAME):$(GHPKG_VER)
+XQERL_IMAGE = $(GHPKG_REGISTRY)/$(REPO_OWNER)/$(REPO_NAME)/$(RUN_NAME):$(GHPKG_VER)
 include inc/*
 
 .PHONY: clean

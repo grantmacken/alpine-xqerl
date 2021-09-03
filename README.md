@@ -8,8 +8,8 @@
  is an Erlang XQuery 3.1 Processor and XML Database.
 
 ## Recent Updates
- - [x] built from [alpine 3.13.4](https://hub.docker.com/_/alpine) docker OS
- - [x] [OTP 23.3.1](https://hub.docker.com/_/erlang) latest [release](https://github.com/erlang/otp/releases)
+ - [x] built from [alpine 3.14.2](https://hub.docker.com/_/alpine) docker OS
+ - [x] [OTP 24.0.6](https://hub.docker.com/_/erlang) latest [release](https://github.com/erlang/otp/releases)
  - [x] built from latest xqerl 
  [merge commit](https://api.github.com/repos/zadean/xqerl/git/commits/1a94833e996435495922346010ce918b4b0717f2)
  - [x] uses config values in .env file to set some xqerl.config values. This is of interest only if you wish to build the image

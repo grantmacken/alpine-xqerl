@@ -16,6 +16,14 @@ build: shell
  .
 	@echo
 
+.PHONY: xshell
+xshell: sha rebar.config
+	@docker buildx build --output "type=image,push=false" \
+  --target $@ \
+  --tag="$(REPO_OWNER)/$(REPO_NAME):$@" \
+ .
+	@echo
+
 .PHONY: shell
 shell: sha rebar.config
 	@docker buildx build --output "type=image,push=false" \
@@ -38,7 +46,6 @@ sha: rebar.config
 	@sed -i 's%$(README_ALPINE)%$(ENV_ALPINE)%g' README.md
 	@sed -i 's%$(DF_ALPINE)%$(ENV_ALPINE)%g' Dockerfile
 # 	% {debug_info, strip}
-
 rebar.config:
 	@cat << EOF > $@
 	{minimum_otp_vsn, "21.2"}.

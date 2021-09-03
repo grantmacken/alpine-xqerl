@@ -3,7 +3,7 @@
 # @ref: https://github.com/grantmacken/alpine-xqerl
 #@ https://github.com/erlang/docker-erlang-otp
 
-FROM erlang:23.3.1-alpine as shell
+FROM erlang:24.0.6-alpine as shell
 LABEL maintainer="Grant MacKenzie <grantmacken@gmail.com>"
 
 WORKDIR /home
@@ -43,7 +43,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
     && mkdir /usr/local/xqerl \
     && tar -zxvf ${REBAR_BASE_DIR}/prod/rel/*/*.tar.gz -C /usr/local/xqerl
     
-FROM alpine:3.13.4
+FROM alpine:3.14.2
 COPY --from=prod /usr/local/xqerl /usr/local/xqerl
 
 RUN  --mount=type=cache,target=/var/cache/apk \

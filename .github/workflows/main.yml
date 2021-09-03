@@ -1,4 +1,4 @@
-name: CI
+name: Build Publish Docker Images
 on: push
 jobs:
   dockerize_xqerl:
@@ -14,21 +14,22 @@ jobs:
           make build
       - name: Start running xqerl
         run: |
+          docker image ls
           make up
           printf %60s | tr ' ' '-' && echo
       - name: Stop running xqerl
         run: |
           make down
           printf %60s | tr ' ' '-' && echo
-      - name: Dockerhub Login In and Push to dockerhub
-        run: |
-          source .env
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io --username ${REPO_OWNER} --password-stdin 
-          docker push ${REPO_OWNER}/${REPO_NAME}:shell
-          docker push ${REPO_OWNER}/${REPO_NAME}:latest
-          docker push ${REPO_OWNER}/${REPO_NAME}:${REPO_SHA}
-      - name: Github Login In and Push to Github Packages
-        run: |
-          source .env
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin
-          docker push docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${RUN_NAME}:${GHPKG_VER}
+      # - name: Dockerhub Login In and Push to dockerhub
+      #   run: |
+      #     source .env
+      #     echo ${{ secrets.DOCKER_PASSWORD }} | docker login docker.io --username ${REPO_OWNER} --password-stdin 
+      #     docker push ${REPO_OWNER}/${REPO_NAME}:shell
+      #     docker push ${REPO_OWNER}/${REPO_NAME}:latest
+      #     docker push ${REPO_OWNER}/${REPO_NAME}:${REPO_SHA}
+      # - name: Github Login In and Push to Github Packages
+      #   run: |
+      #     source .env
+      #     echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com --username ${REPO_OWNER} --password-stdin
+      #     docker push docker.pkg.github.com/${REPO_OWNER}/${REPO_NAME}/${RUN_NAME}:${GHPKG_VER}
