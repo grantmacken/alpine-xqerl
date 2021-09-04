@@ -12,15 +12,7 @@ build: shell
 	@docker buildx build --output "type=image,push=false" \
   --tag="$(REPO_OWNER)/$(REPO_NAME):$(ENV_SHA)" \
   --tag="$(REPO_OWNER)/$(REPO_NAME):latest" \
-  --tag="$(XQERL_IMAGE)" \
- .
-	@echo
-
-.PHONY: xshell
-xshell: sha rebar.config
-	@docker buildx build --output "type=image,push=false" \
-  --target $@ \
-  --tag="$(REPO_OWNER)/$(REPO_NAME):$@" \
+  --tag="$(GHPKG_REGISTRY)/$(REPO_OWNER)/$(REPO_NAME):$(GHPKG_VER)" \
  .
 	@echo
 
@@ -31,6 +23,7 @@ shell: sha rebar.config
   --tag="$(REPO_OWNER)/$(REPO_NAME):$@" \
  .
 	@echo
+
 
 .PHONY: sha
 sha: rebar.config
