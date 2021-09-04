@@ -38,4 +38,4 @@ jobs:
         run: |
           source .env
           echo "${REPO_OWNER}/${REPO_NAME}:${GHPKG_VER}"
-          docker push ghcr.io/${REPO_OWNER}/${REPO_NAME}
+          docker push ghcr.io/${REPO_OWNER}/${REPO_NAME}:${GHPKG_VER}
