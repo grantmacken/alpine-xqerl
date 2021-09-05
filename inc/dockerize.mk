@@ -4,40 +4,38 @@ ENV_OTP = $(shell grep -oP 'FROM_ERLANG=\K(.+)' .env)
 ENV_ALPINE = $(shell grep -oP 'FROM_ALPINE=\K(.+)' .env)
 README_OTP = $(shell grep -oP 'OTP \K([0-9.]+)' README.md)
 README_ALPINE = $(shell grep -oP 'alpine \K([0-9.]+)' README.md)
-DF_ALPINE = $(shell grep -oP 'FROM alpine:\K(.+)' Dockerfile)
-DF_ERLANG = $(shell grep -oP 'FROM erlang:\K([0-9.]+)' Dockerfile)
+DF_ALPINE = $(shell grep -oP 'FROM docker.io/alpine:\K(.+)' Dockerfile)
+DF_ERLANG = $(shell grep -oP 'FROM docker.io/erlang:\K([0-9.]+)' Dockerfile)
 
 .PHONY: build
 build: shell
-	@docker buildx build --output "type=image,push=false" \
-  --tag="$(REPO_OWNER)/$(REPO_NAME):$(ENV_SHA)" \
-  --tag="$(REPO_OWNER)/$(REPO_NAME):latest" \
+	@podman build \
   --tag="$(GHPKG_REGISTRY)/$(REPO_OWNER)/$(REPO_NAME):$(GHPKG_VER)" \
  .
 	@echo
 
 .PHONY: shell
 shell: sha rebar.config
-	@docker buildx build --output "type=image,push=false" \
+	@podman build \
   --target $@ \
-  --tag="$(REPO_OWNER)/$(REPO_NAME):$@" \
+  --tag="$(GHPKG_REGISTRY)/$(REPO_OWNER)/$(REPO_NAME):$@" \
  .
 	@echo
-
 
 .PHONY: sha
 sha: rebar.config
 	@echo "previous commit sha: $(ENV_SHA)"
 	@LATEST=$(HEAD_SHA);
 	@echo "  latest commit sha: $$LATEST";
-	if [ ! "$$LATEST" = "$(ENV_SHA)" ]; 
-	then sed -i 's/$(ENV_SHA)/$(HEAD_SHA)/' .env
+	if [ ! "$$LATEST" = "$(ENV_SHA)" ] 
+	then 
+	sed -i 's/$(ENV_SHA)/$(HEAD_SHA)/' .env
 	fi
-	@sed -i 's%$(ENV_SHA)%$(HEAD_SHA)%g' README.md
-	@sed -i 's%$(README_OTP)%$(ENV_OTP)%g' README.md
 	@sed -i 's%$(DF_ERLANG)%$(ENV_OTP)%g' Dockerfile
-	@sed -i 's%$(README_ALPINE)%$(ENV_ALPINE)%g' README.md
 	@sed -i 's%$(DF_ALPINE)%$(ENV_ALPINE)%g' Dockerfile
+	@#sed -i 's%$(ENV_SHA)%$(HEAD_SHA)%g' README.md
+	@#sed -i 's%$(README_OTP)%$(ENV_OTP)%g' README.md
+	@#sed -i 's%$(README_ALPINE)%$(ENV_ALPINE)%g' README.md
 # 	% {debug_info, strip}
 rebar.config:
 	@cat << EOF > $@

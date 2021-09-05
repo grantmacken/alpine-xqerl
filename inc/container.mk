@@ -1,4 +1,5 @@
 ##################################################################
+XQERL_IMAGE := $(GHPKG_REGISTRY)/$(REPO_OWNER)/$(REPO_NAME):$(GHPKG_VER)
 MustHaveNetwork = docker network list --format "{{.Name}}" | \
  grep -q $(1) || docker network create $(NETWORK) &>/dev/null
 
@@ -53,6 +54,23 @@ down:
 
 .PHONY: run-shell
 run-shell:
-	@docker run  -it --rm \
+	@podman run  -it --rm \
   --name  xqShell \
-  $(REPO_OWNER)/$(REPO_NAME):shell
+	$(GHPKG_REGISTRY)/$(REPO_OWNER)/$(REPO_NAME):shell
+
+.PHONY: run
+run:
+	@echo $(XQERL_IMAGE)
+	@podman run --rm \
+  --name  xqBuild \
+	--env "TZ=$(TZ)" \
+	--env "NAME=$(NAME)" \
+	--publish 8081:8081 \
+	$(XQERL_IMAGE)
+
+.PHONY: inspect
+inspect:
+	@podman run  -it --rm \
+  --name  xqInspect \
+	--entrypoint="/bin/ash" \
+	$(GHPKG_REGISTRY)/$(REPO_OWNER)/$(REPO_NAME):shell
